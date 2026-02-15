@@ -3221,7 +3221,7 @@ function pomoSetMode(mode) {
 function pomoUpdateModeButtons() {
   document.getElementById('pomoModeWork').className = 'pomo-mode-btn' + (pomoMode === 'work' ? ' active-work' : '');
   document.getElementById('pomoModeShort').className = 'pomo-mode-btn' + (pomoMode === 'short' ? ' active-short' : '');
-  document.getElementById('pomoModeLabel').textContent = pomoMode === 'work' ? '集中' : '休憩';
+  document.getElementById('pomoModeLabel').textContent = pomoMode === 'work' ? '✏️' : '☕';
 }
 
 function pomoUpdateDisplay() {
