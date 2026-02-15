@@ -6,8 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="totonoe-jikan">
-<link rel="apple-touch-icon" href="totonoe-jikan.png">
-<link rel="icon" type="image/png" href="totonoe-jikan.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180x180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-96x96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0A0E1A">
 <title>ととのえ時間−今日が成長＆ときめきの１日になりますように</title>
@@ -3101,6 +3102,49 @@ let pomoSessions = 0;
 let pomoLog = []; // {startTime, endTime, mode}
 let pomoCurrentStart = null;
 
+function savePomoState() {
+  try {
+    localStorage.setItem('aical_pomo_state', JSON.stringify({
+      mode: pomoMode,
+      timeLeft: pomoTimeLeft,
+      running: pomoRunning,
+      savedAt: Date.now(),
+      currentStart: pomoCurrentStart ? pomoCurrentStart.toISOString() : null,
+      sessions: pomoSessions
+    }));
+  } catch(e) {}
+}
+
+function restorePomoState() {
+  try {
+    const data = JSON.parse(localStorage.getItem('aical_pomo_state'));
+    if (!data) return;
+    pomoMode = data.mode || 'work';
+    pomoSessions = data.sessions || 0;
+    if (data.currentStart) pomoCurrentStart = new Date(data.currentStart);
+
+    if (data.running && data.savedAt) {
+      const elapsed = Math.floor((Date.now() - data.savedAt) / 1000);
+      pomoTimeLeft = Math.max(0, data.timeLeft - elapsed);
+      if (pomoTimeLeft <= 0) {
+        // Timer would have completed during reload
+        pomoTimeLeft = 0;
+        pomoUpdateDisplay();
+        pomoComplete();
+        return;
+      }
+      // Resume running
+      pomoUpdateModeButtons();
+      pomoUpdateDisplay();
+      pomoStart();
+    } else {
+      pomoTimeLeft = data.timeLeft || POMO_MODES[pomoMode].duration;
+      pomoUpdateModeButtons();
+      pomoUpdateDisplay();
+    }
+  } catch(e) {}
+}
+
 const GANTT_START = 8; // 8:00
 const GANTT_END = 19;  // 19:00
 const GANTT_TOTAL_MIN = (GANTT_END - GANTT_START) * 60;
@@ -3111,6 +3155,7 @@ function pomoSetMode(mode) {
   pomoTimeLeft = POMO_MODES[mode].duration;
   pomoUpdateDisplay();
   pomoUpdateModeButtons();
+  savePomoState();
 }
 
 function pomoUpdateModeButtons() {
@@ -3148,6 +3193,7 @@ function pomoStart() {
   document.getElementById('pomoStartBtn').innerHTML = '⏸';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
   if (pomoMode === 'work') startRain(); else stopRain();
+  savePomoState();
 
   pomoInterval = setInterval(() => {
     pomoTimeLeft--;
@@ -3159,6 +3205,7 @@ function pomoStart() {
     }
     pomoUpdateDisplay();
     ganttRender();
+    savePomoState();
   }, 1000);
 }
 
@@ -3169,6 +3216,7 @@ function pomoPause() {
   document.getElementById('pomoStartBtn').innerHTML = '▶';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-start';
   ganttRender();
+  savePomoState();
 }
 
 function pomoReset() {
@@ -3193,6 +3241,7 @@ function pomoReset() {
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-start';
   pomoUpdateDisplay();
   ganttRender();
+  savePomoState();
 }
 
 function pomoComplete() {
@@ -3256,7 +3305,9 @@ function pomoComplete() {
       }
       pomoUpdateDisplay();
       ganttRender();
+      savePomoState();
     }, 1000);
+    savePomoState();
   }, 1000);
 }
 
@@ -3402,7 +3453,14 @@ function ganttLoad() {
 ganttLoad();
 ganttInitTicks();
 ganttRender();
+restorePomoState();
 pomoUpdateDisplay();
+
+// Save state when leaving page
+window.addEventListener('beforeunload', savePomoState);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') savePomoState();
+});
 
 // Update now-line every minute
 setInterval(() => { if (!pomoRunning) ganttRender(); }, 60000);
