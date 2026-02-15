@@ -3191,11 +3191,14 @@ function pomoReset() {
 }
 
 function pomoComplete() {
-  pomoRunning = false;
   clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoRunning = false;
   stopRain();
 
-  if (pomoMode === 'work') {
+  const prevMode = pomoMode;
+
+  if (prevMode === 'work') {
     pomoSessions++;
   }
 
@@ -3204,7 +3207,7 @@ function pomoComplete() {
     pomoLog.push({
       startTime: pomoCurrentStart,
       endTime: new Date(),
-      mode: pomoMode,
+      mode: prevMode,
     });
     pomoCurrentStart = null;
     ganttSave();
@@ -3212,7 +3215,7 @@ function pomoComplete() {
 
   // Notification
   if ('Notification' in window && Notification.permission === 'granted') {
-    const msg = pomoMode === 'work'
+    const msg = prevMode === 'work'
       ? '集中タイム終了！休憩しましょう 🎉'
       : '休憩終了！集中タイムに戻りましょう 💪';
     new Notification('🍅 ポモドーロ', {
@@ -3222,24 +3225,34 @@ function pomoComplete() {
     });
   }
 
-  if (pomoMode === 'work') playSound('pomo-work');
+  if (prevMode === 'work') playSound('pomo-work');
 
-  // Auto switch and start next mode
-  if (pomoMode === 'work') {
-    pomoMode = 'short';
-  } else {
-    pomoMode = 'work';
-  }
+  // Switch to next mode
+  pomoMode = prevMode === 'work' ? 'short' : 'work';
   pomoTimeLeft = POMO_MODES[pomoMode].duration;
   pomoUpdateModeButtons();
   pomoUpdateDisplay();
   ganttRender();
 
-  // Auto-start next timer (slight delay for notification sound)
+  // Auto-start next timer
   setTimeout(() => {
     pomoCurrentStart = new Date();
-    pomoStart();
-  }, 1500);
+    pomoRunning = true;
+    document.getElementById('pomoStartBtn').innerHTML = '⏸';
+    document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
+    if (pomoMode === 'work') startRain(); else stopRain();
+    pomoInterval = setInterval(() => {
+      pomoTimeLeft--;
+      if (pomoTimeLeft <= 0) {
+        pomoTimeLeft = 0;
+        pomoUpdateDisplay();
+        pomoComplete();
+        return;
+      }
+      pomoUpdateDisplay();
+      ganttRender();
+    }, 1000);
+  }, 1000);
 }
 
 // ════════════════════════════════════════
