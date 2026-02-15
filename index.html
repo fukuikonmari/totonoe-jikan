@@ -1835,59 +1835,49 @@ let editOpen = false;
 let activeReminders = []; // {timerId, minBefore, fireTime, eventId}
 
 // ════════════════════════════════════════
-//  Audio (WAV blob approach - more reliable)
+//  Audio - Direct sample generation (no WAV, no async decode)
 // ════════════════════════════════════════
-function generateToneWav(frequencies, durations, volume) {
+function generateToneSamples(frequencies, durations, volume) {
   const sampleRate = 44100;
   let totalSamples = 0;
   durations.forEach(d => totalSamples += Math.floor(sampleRate * d));
-  
-  const buffer = new ArrayBuffer(44 + totalSamples * 2);
-  const view = new DataView(buffer);
-  
-  // WAV header
-  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
-  writeStr(0, 'RIFF');
-  view.setUint32(4, 36 + totalSamples * 2, true);
-  writeStr(8, 'WAVE');
-  writeStr(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  writeStr(36, 'data');
-  view.setUint32(40, totalSamples * 2, true);
-  
-  let offset = 44;
+  const samples = new Float32Array(totalSamples);
+  let pos = 0;
   for (let t = 0; t < frequencies.length; t++) {
     const freq = frequencies[t];
     const dur = durations[t];
-    const samples = Math.floor(sampleRate * dur);
-    for (let i = 0; i < samples; i++) {
-      const env = 1 - (i / samples); // fade out
-      const val = Math.sin(2 * Math.PI * freq * i / sampleRate) * volume * env;
-      const s = Math.max(-1, Math.min(1, val));
-      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-      offset += 2;
+    const n = Math.floor(sampleRate * dur);
+    for (let i = 0; i < n; i++) {
+      const env = 1 - (i / n);
+      samples[pos++] = Math.sin(2 * Math.PI * freq * i / sampleRate) * volume * env;
     }
   }
-  
-  return new Blob([buffer], { type: 'audio/wav' });
+  return samples;
 }
 
-// Pre-generate sound blobs
-const soundBlobs = {
-  reminder: generateToneWav([880, 1100, 880], [0.3, 0.3, 0.4], 0.9),
-  'pomo-work': generateToneWav([523, 659, 784], [0.25, 0.25, 0.4], 0.5),
-  'pomo-break': generateToneWav([440, 523], [0.3, 0.4], 0.5),
+// Pre-generate raw samples at page load (no audio API needed)
+const soundSamples = {
+  reminder: generateToneSamples([880, 1100, 880, 1100], [0.2, 0.2, 0.2, 0.3], 1.0),
+  'pomo-work': generateToneSamples([523, 659, 784], [0.25, 0.25, 0.4], 0.7),
+  'pomo-break': generateToneSamples([440, 523], [0.3, 0.4], 0.7),
 };
 
-// Safari audio unlock: create a persistent Audio element on first user gesture
+// Pre-built AudioBuffers (created when AudioContext is ready)
+let soundBuffers = {};
+
+function buildSoundBuffers() {
+  if (!rainCtx) return;
+  Object.keys(soundSamples).forEach(type => {
+    if (soundBuffers[type]) return;
+    const samples = soundSamples[type];
+    const buf = rainCtx.createBuffer(1, samples.length, 44100);
+    buf.getChannelData(0).set(samples);
+    soundBuffers[type] = buf;
+  });
+}
+
+// Safari audio unlock
 let audioUnlocked = false;
-let persistentAudio = null;
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -1986,26 +1976,7 @@ function ensureAudioCtx() {
     rainCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
   if (rainCtx.state === 'suspended') rainCtx.resume();
-  decodeSoundsIfNeeded();
-}
-
-// Pre-decoded audio buffers for alarm sounds
-let decodedSounds = {};
-let soundsDecoded = false;
-
-function decodeSoundsIfNeeded() {
-  if (soundsDecoded || !rainCtx) return;
-  soundsDecoded = true;
-  Object.keys(soundBlobs).forEach(type => {
-    const blob = soundBlobs[type];
-    const reader = new FileReader();
-    reader.onload = function() {
-      rainCtx.decodeAudioData(reader.result.slice(0), buf => {
-        decodedSounds[type] = buf;
-      }, () => {});
-    };
-    reader.readAsArrayBuffer(blob);
-  });
+  buildSoundBuffers();
 }
 
 function playSound(type) {
@@ -2013,23 +1984,13 @@ function playSound(type) {
     if (!rainCtx) return;
     if (rainCtx.state === 'suspended') rainCtx.resume();
 
-    const buf = decodedSounds[type];
-    if (!buf) {
-      // Fallback: try HTML Audio
-      const blob = soundBlobs[type];
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = new Audio(url);
-      a.volume = 1.0;
-      a.play().catch(() => {});
-      a.onended = () => URL.revokeObjectURL(url);
-      return;
-    }
+    const buf = soundBuffers[type];
+    if (!buf) return;
 
     const source = rainCtx.createBufferSource();
     const gain = rainCtx.createGain();
     source.buffer = buf;
-    gain.gain.value = 1.5;
+    gain.gain.value = 2.0;
     source.connect(gain);
     gain.connect(rainCtx.destination);
     source.start(0);
@@ -2953,26 +2914,23 @@ function sendNotification(ev, minBefore) {
 
   // Stop rain before alarm
   const wasRainActive = rainActive;
-  if (wasRainActive) stopRain();
+  stopRain();
 
-  // Small delay to ensure rain is fully stopped, then play alarm
-  setTimeout(() => {
-    new Notification(`📅 ${ev.title}`, {
-      body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
-      requireInteraction: true,
-    });
+  new Notification(`📅 ${ev.title}`, {
+    body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
+    requireInteraction: true,
+  });
 
-    playSound('reminder');
+  playSound('reminder');
 
-    // Resume rain after alarm sound finishes
-    if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
-      setTimeout(() => {
-        rainActive = false;
-        startRain();
-      }, 2000);
-    }
-  }, 200);
+  // Resume rain after alarm sound finishes
+  if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
+    setTimeout(() => {
+      rainActive = false;
+      startRain();
+    }, 1500);
+  }
 }
 
 function updateReminderChips() {
