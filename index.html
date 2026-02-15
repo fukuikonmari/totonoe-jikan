@@ -1039,6 +1039,8 @@
     padding: 2px 8px;
     border-radius: 6px;
     transition: all 0.2s;
+    position: relative;
+    left: 9px;
   }
   .memo-clear-btn:hover {
     background: rgba(248,113,113,0.1);
@@ -1286,8 +1288,8 @@
   }
   .pomo-spark-joy {
     position: absolute;
-    top: 28%;
-    left: 50%;
+    top: 20%;
+    left: 52%;
     transform: translateX(-50%);
     font-family: 'EB Garamond', serif;
     font-size: 12px;
@@ -1295,6 +1297,15 @@
     letter-spacing: -0.5px;
     color: var(--text-dim);
     white-space: nowrap;
+    text-align: center;
+    line-height: 1.05;
+  }
+  .spark-does {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    left: -4px;
   }
   .pomo-time-text {
     position: absolute;
@@ -1556,7 +1567,7 @@
               </g>
             </svg>
             <div class="pomo-time-inner">
-              <div class="pomo-spark-joy">Spark Joy</div>
+              <div class="pomo-spark-joy"><span class="spark-does">Does it</span><br>Spark Joy？</div>
               <div class="pomo-time-text" id="pomoTimeText">25:00</div>
             </div>
           </div>
@@ -1849,92 +1860,91 @@ function unlockAudio() {
 });
 
 // Generate rain noise (looping white noise with filtering)
-function generateRainWav(durationSec) {
+// ════════════════════════════════════════
+//  Rain Audio (Web Audio API - instant playback)
+// ════════════════════════════════════════
+function generateRainSamples(durationSec) {
   const sampleRate = 44100;
-  const totalSamples = Math.floor(sampleRate * durationSec);
-  const buffer = new ArrayBuffer(44 + totalSamples * 2);
-  const view = new DataView(buffer);
-
-  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
-  writeStr(0, 'RIFF');
-  view.setUint32(4, 36 + totalSamples * 2, true);
-  writeStr(8, 'WAVE');
-  writeStr(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true);
-  view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  writeStr(36, 'data');
-  view.setUint32(40, totalSamples * 2, true);
-
-  // Gentle rain: soft brown noise + light droplets
+  const total = Math.floor(sampleRate * durationSec);
+  const samples = new Float32Array(total);
   let last = 0;
-  let offset = 44;
-  for (let i = 0; i < totalSamples; i++) {
+  for (let i = 0; i < total; i++) {
     const white = Math.random() * 2 - 1;
     last = (last + (0.015 * white)) / 1.015;
     const brown = last * 2.5;
-    // Sparse, soft droplets
     const drop = (Math.random() > 0.994) ? (Math.random() * 0.12 - 0.06) : 0;
-    const val = (brown * 0.5 + white * 0.02 + drop) * 0.25;
-    const s = Math.max(-1, Math.min(1, val));
-    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-    offset += 2;
+    samples[i] = Math.max(-1, Math.min(1, (brown * 0.5 + white * 0.02 + drop) * 0.25));
   }
-  return new Blob([buffer], { type: 'audio/wav' });
+  return samples;
 }
 
-const rainBlob = generateRainWav(10); // 10 second loop
-const rainUrl1 = URL.createObjectURL(rainBlob);
-const rainUrl2 = URL.createObjectURL(generateRainWav(10));
-let rainAudioA = new Audio(rainUrl1);
-let rainAudioB = new Audio(rainUrl2);
-rainAudioA.preload = 'auto';
-rainAudioB.preload = 'auto';
+// Pre-generate samples at page load (fast, no audio API needed)
+const rainSamplesA = generateRainSamples(3);
+const rainSamplesB = generateRainSamples(3);
+
+let rainCtx = null;
+let rainBufA = null;
+let rainBufB = null;
+let rainSourceA = null;
+let rainSourceB = null;
+let rainGainA = null;
+let rainGainB = null;
 let rainCrossfadeTimer = null;
 let rainFaderInterval = null;
 let rainActive = false;
 
-function startRain() {
-  if (pomoTickMuted || rainActive) return;
-  rainActive = true;
-  rainAudioA.currentTime = 0;
-  rainAudioA.volume = 0.18;
-  rainAudioA.play().catch(() => {});
+function ensureRainReady() {
+  if (!rainCtx) {
+    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+    rainBufA = rainCtx.createBuffer(1, rainSamplesA.length, 44100);
+    rainBufA.getChannelData(0).set(rainSamplesA);
+    rainBufB = rainCtx.createBuffer(1, rainSamplesB.length, 44100);
+    rainBufB.getChannelData(0).set(rainSamplesB);
+  }
+  if (rainCtx.state === 'suspended') rainCtx.resume();
+  return true;
+}
 
-  const loopDur = 7000;
-  const fadeTime = 4000;
+function playRainNode(buf, volume) {
+  const source = rainCtx.createBufferSource();
+  const gain = rainCtx.createGain();
+  source.buffer = buf;
+  source.loop = false;
+  gain.gain.value = volume;
+  source.connect(gain);
+  gain.connect(rainCtx.destination);
+  source.start(0);
+  return { source, gain };
+}
+
+function startRainLoop() {
+  const loopDur = 2000;
+  const fadeTime = 1500;
 
   function scheduleCrossfade() {
     rainCrossfadeTimer = setTimeout(() => {
       if (!rainActive) return;
-      rainAudioB.currentTime = 0;
-      rainAudioB.volume = 0;
-      rainAudioB.play().catch(() => {});
+      const nodeB = playRainNode(rainBufB, 0);
+      rainSourceB = nodeB.source;
+      rainGainB = nodeB.gain;
 
       let fadeStep = 0;
-      const fadeSteps = 60;
+      const fadeSteps = 40;
       const fadeInterval = fadeTime / fadeSteps;
 
       rainFaderInterval = setInterval(() => {
         fadeStep++;
         const t = fadeStep / fadeSteps;
-        const fadeOut = Math.cos(t * Math.PI * 0.5);
-        const fadeIn = Math.sin(t * Math.PI * 0.5);
-        rainAudioA.volume = Math.max(0, 0.18 * fadeOut);
-        rainAudioB.volume = 0.18 * fadeIn;
+        if (rainGainA) rainGainA.gain.value = Math.max(0, 0.55 * Math.cos(t * Math.PI * 0.5));
+        if (rainGainB) rainGainB.gain.value = 0.55 * Math.sin(t * Math.PI * 0.5);
         if (fadeStep >= fadeSteps) {
           clearInterval(rainFaderInterval);
           rainFaderInterval = null;
-          rainAudioA.pause();
-          rainAudioA.currentTime = 0;
-          // Swap
-          const tmp = rainAudioA;
-          rainAudioA = rainAudioB;
-          rainAudioB = tmp;
+          try { rainSourceA.stop(); } catch(e) {}
+          rainSourceA = rainSourceB;
+          rainGainA = rainGainB;
+          rainSourceB = null;
+          rainGainB = null;
           if (rainActive) scheduleCrossfade();
         }
       }, fadeInterval);
@@ -1944,15 +1954,44 @@ function startRain() {
   scheduleCrossfade();
 }
 
+function startRain() {
+  if (pomoTickMuted || rainActive || pomoRestoring) return;
+  ensureRainReady();
+  rainActive = true;
+  const nodeA = playRainNode(rainBufA, 0.55);
+  rainSourceA = nodeA.source;
+  rainGainA = nodeA.gain;
+  startRainLoop();
+}
+
 function stopRain() {
   rainActive = false;
   if (rainCrossfadeTimer) { clearTimeout(rainCrossfadeTimer); rainCrossfadeTimer = null; }
   if (rainFaderInterval) { clearInterval(rainFaderInterval); rainFaderInterval = null; }
-  rainAudioA.pause(); rainAudioA.currentTime = 0; rainAudioA.volume = 0;
-  rainAudioB.pause(); rainAudioB.currentTime = 0; rainAudioB.volume = 0;
+  try { if (rainSourceA) { rainSourceA.stop(); rainSourceA = null; } } catch(e) {}
+  try { if (rainSourceB) { rainSourceB.stop(); rainSourceB = null; } } catch(e) {}
+  rainGainA = null; rainGainB = null;
 }
 
 let pomoTickMuted = false;
+let rainPendingResume = false;
+let pomoRestoring = false;
+
+// Browser blocks autoplay after reload. Resume rain on first user tap.
+function setupAudioResume() {
+  function resumeAudio() {
+    if (rainPendingResume && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
+      rainPendingResume = false;
+      ensureRainReady();
+      rainActive = false;
+      startRain();
+    }
+    document.removeEventListener('click', resumeAudio);
+    document.removeEventListener('touchstart', resumeAudio);
+  }
+  document.addEventListener('click', resumeAudio);
+  document.addEventListener('touchstart', resumeAudio);
+}
 
 function toggleTickMute() {
   pomoTickMuted = !pomoTickMuted;
@@ -3136,7 +3175,14 @@ function restorePomoState() {
       // Resume running
       pomoUpdateModeButtons();
       pomoUpdateDisplay();
+      pomoRestoring = true;
       pomoStart();
+      pomoRestoring = false;
+      // Rain can't autoplay without user gesture - queue it
+      if (pomoMode === 'work') {
+        rainPendingResume = true;
+        setupAudioResume();
+      }
     } else {
       pomoTimeLeft = data.timeLeft || POMO_MODES[pomoMode].duration;
       pomoUpdateModeButtons();
