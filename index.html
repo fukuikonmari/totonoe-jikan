@@ -2103,7 +2103,7 @@ async function parseAndAlarmOnly() {
     return;
   }
 
-  addToHistory(ev);
+  addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
   const now = Date.now();
@@ -2540,7 +2540,7 @@ function saveHistory(list) {
   } catch(e) {}
 }
 
-function addToHistory(ev) {
+function addToHistory(ev, alarmOnly) {
   const list = getHistory();
   const entry = {
     id: Date.now(),
@@ -2551,6 +2551,7 @@ function addToHistory(ev) {
     location: ev.location || null,
     description: ev.description || null,
     registeredAt: new Date().toISOString(),
+    alarmOnly: alarmOnly || false,
   };
   list.unshift(entry);
   // Keep max 50 entries
@@ -2633,11 +2634,14 @@ function renderHistory() {
     const dotClass = isUpcoming ? 'upcoming' : 'past';
     const dateStr = entry.allDay
       ? formatJP(entry.startDate, true) + '（終日）'
-      : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
+      : entry.alarmOnly
+        ? formatJP(entry.startDate, false)
+        : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
+    const alarmBadge = entry.alarmOnly ? '<span style="font-size:10px;color:#F59E0B;margin-left:4px">🔔</span>' : '';
     return `<div class="history-item">
       <div class="history-dot ${dotClass}"></div>
       <div class="history-info">
-        <div class="history-info-title">${hasReminder(entry.startDate) ? '<span class="history-bell">🔔</span>' : ''}${escHTML(entry.title)}</div>
+        <div class="history-info-title">${hasReminder(entry.startDate) ? '<span class="history-bell">🔔</span>' : ''}${escHTML(entry.title)}${alarmBadge}</div>
         <div class="history-info-date">${escHTML(dateStr)}${entry.location ? ' 📍' + escHTML(entry.location) : ''}</div>
       </div>
       <div class="history-actions">
@@ -2733,7 +2737,7 @@ async function alarmOnly() {
     return;
   }
 
-  addToHistory(ev);
+  addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
   const now = Date.now();
@@ -2914,6 +2918,10 @@ function sendNotification(ev, minBefore) {
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
 
+  // Pause rain during alarm
+  const wasRainActive = rainActive;
+  if (wasRainActive) stopRain();
+
   new Notification(`📅 ${ev.title}`, {
     body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
@@ -2921,6 +2929,11 @@ function sendNotification(ev, minBefore) {
   });
 
   playSound('reminder');
+
+  // Resume rain after alarm sound
+  if (wasRainActive && pomoRunning && pomoMode === 'work') {
+    setTimeout(() => { startRain(); }, 3000);
+  }
 }
 
 function updateReminderChips() {
