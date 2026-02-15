@@ -3326,6 +3326,7 @@ function pomoComplete() {
   }
 
   if (prevMode === 'work') playSound('pomo-work');
+  if (prevMode === 'short') playSound('pomo-break');
 
   // Switch to next mode
   pomoMode = prevMode === 'work' ? 'short' : 'work';
