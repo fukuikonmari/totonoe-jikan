@@ -1835,45 +1835,24 @@ let editOpen = false;
 let activeReminders = []; // {timerId, minBefore, fireTime, eventId}
 
 // ════════════════════════════════════════
-//  Audio - Direct sample generation (no WAV, no async decode)
-// ════════════════════════════════════════
-function generateToneSamples(frequencies, durations, volume) {
-  const sampleRate = 44100;
-  let totalSamples = 0;
-  durations.forEach(d => totalSamples += Math.floor(sampleRate * d));
-  const samples = new Float32Array(totalSamples);
-  let pos = 0;
-  for (let t = 0; t < frequencies.length; t++) {
-    const freq = frequencies[t];
-    const dur = durations[t];
-    const n = Math.floor(sampleRate * dur);
-    for (let i = 0; i < n; i++) {
-      const env = 1 - (i / n);
-      samples[pos++] = Math.sin(2 * Math.PI * freq * i / sampleRate) * volume * env;
-    }
+// Alarm AudioContext - kept alive from user gesture until alarm fires
+let alarmCtx = null;
+let alarmKeepAlive = null;
+
+function ensureAlarmCtx() {
+  if (alarmCtx && alarmCtx.state !== 'closed') {
+    if (alarmCtx.state === 'suspended') alarmCtx.resume();
+    return;
   }
-  return samples;
-}
-
-// Pre-generate raw samples at page load (no audio API needed)
-const soundSamples = {
-  reminder: generateToneSamples([880, 1100, 880, 1100], [0.2, 0.2, 0.2, 0.3], 1.0),
-  'pomo-work': generateToneSamples([523, 659, 784], [0.25, 0.25, 0.4], 0.7),
-  'pomo-break': generateToneSamples([440, 523], [0.3, 0.4], 0.7),
-};
-
-// Pre-built AudioBuffers (created when AudioContext is ready)
-let soundBuffers = {};
-
-function buildSoundBuffers() {
-  if (!rainCtx) return;
-  Object.keys(soundSamples).forEach(type => {
-    if (soundBuffers[type]) return;
-    const samples = soundSamples[type];
-    const buf = rainCtx.createBuffer(1, samples.length, 44100);
-    buf.getChannelData(0).set(samples);
-    soundBuffers[type] = buf;
-  });
+  alarmCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Keep context alive with a silent node
+  alarmKeepAlive = alarmCtx.createGain();
+  alarmKeepAlive.gain.value = 0;
+  alarmKeepAlive.connect(alarmCtx.destination);
+  const silent = alarmCtx.createOscillator();
+  silent.frequency.value = 0;
+  silent.connect(alarmKeepAlive);
+  silent.start();
 }
 
 // Safari audio unlock
@@ -1976,24 +1955,35 @@ function ensureAudioCtx() {
     rainCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
   if (rainCtx.state === 'suspended') rainCtx.resume();
-  buildSoundBuffers();
 }
 
 function playSound(type) {
   try {
     if (!rainCtx) return;
-    if (rainCtx.state === 'suspended') rainCtx.resume();
+    rainCtx.resume();
 
-    const buf = soundBuffers[type];
-    if (!buf) return;
+    const sounds = {
+      'reminder': [{ freq: 880, dur: 0.2 }, { freq: 1100, dur: 0.2 }, { freq: 880, dur: 0.2 }, { freq: 1100, dur: 0.3 }],
+      'pomo-work': [{ freq: 523, dur: 0.25 }, { freq: 659, dur: 0.25 }, { freq: 784, dur: 0.4 }],
+      'pomo-break': [{ freq: 440, dur: 0.3 }, { freq: 523, dur: 0.4 }],
+    };
+    const notes = sounds[type];
+    if (!notes) return;
 
-    const source = rainCtx.createBufferSource();
     const gain = rainCtx.createGain();
-    source.buffer = buf;
-    gain.gain.value = 2.0;
-    source.connect(gain);
+    gain.gain.value = type === 'reminder' ? 2.5 : 1.5;
     gain.connect(rainCtx.destination);
-    source.start(0);
+
+    let t = rainCtx.currentTime;
+    notes.forEach(note => {
+      const osc = rainCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = note.freq;
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + note.dur * 0.9);
+      t += note.dur;
+    });
   } catch(e) {
     console.warn('Audio error:', e);
   }
@@ -2094,6 +2084,7 @@ async function parseAndAlarmOnly() {
   }
 
   ensureAudioCtx();
+  ensureAlarmCtx();
   addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
@@ -2730,6 +2721,7 @@ async function alarmOnly() {
 
   ensureAudioCtx();
   addToHistory(ev, true);
+  ensureAlarmCtx();
 
   const eventTime = safeParseDate(ev.startDate).getTime();
   const now = Date.now();
@@ -2879,6 +2871,7 @@ async function setReminder(minBefore) {
 
   ensureAudioCtx();
 
+  ensureAlarmCtx();
   // Calculate fire time
   const eventTime = safeParseDate(ev.startDate).getTime();
   const fireTime = eventTime - (minBefore * 60 * 1000);
@@ -2912,25 +2905,69 @@ function sendNotification(ev, minBefore) {
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
 
-  // Stop rain before alarm
+  // 1) Stop rain
   const wasRainActive = rainActive;
   stopRain();
 
-  new Notification(`📅 ${ev.title}`, {
-    body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
-    requireInteraction: true,
-  });
+  // 2) Show notification
+  try {
+    new Notification(`📅 ${ev.title}`, {
+      body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
+      requireInteraction: true,
+    });
+  } catch(e) {}
 
-  playSound('reminder');
-
-  // Resume rain after alarm sound finishes
-  if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
-    setTimeout(() => {
+  // 3) Resume rain helper
+  let resumed = false;
+  function resumeRainOnce() {
+    if (resumed) return;
+    resumed = true;
+    if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
       rainActive = false;
       startRain();
-    }, 1500);
+    }
   }
+
+  // 4) Play alarm after 1s using pre-created alarmCtx
+  setTimeout(() => {
+    try {
+      if (alarmCtx && alarmCtx.state !== 'closed') {
+        if (alarmCtx.state === 'suspended') alarmCtx.resume();
+        const notes = [
+          { freq: 880, dur: 0.2 },
+          { freq: 1100, dur: 0.2 },
+          { freq: 880, dur: 0.2 },
+          { freq: 1100, dur: 0.3 },
+        ];
+        const gain = alarmCtx.createGain();
+        gain.gain.value = 2.5;
+        gain.connect(alarmCtx.destination);
+
+        let t = alarmCtx.currentTime;
+        notes.forEach(note => {
+          const osc = alarmCtx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = note.freq;
+          osc.connect(gain);
+          osc.start(t);
+          osc.stop(t + note.dur * 0.9);
+          t += note.dur;
+        });
+
+        // Resume rain after alarm
+        setTimeout(resumeRainOnce, 1500);
+      } else {
+        resumeRainOnce();
+      }
+    } catch(e) {
+      console.warn('Alarm error:', e);
+      resumeRainOnce();
+    }
+  }, 1000);
+
+  // 5) Absolute safety: resume rain after 4s no matter what
+  setTimeout(resumeRainOnce, 4000);
 }
 
 function updateReminderChips() {
@@ -3686,5 +3723,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>
+<div style="text-align:center;padding:12px 0 8px;font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;letter-spacing:0.5px">v2026.02.16.01</div>
 </body>
 </html>
