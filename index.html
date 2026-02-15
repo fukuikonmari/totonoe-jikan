@@ -1867,13 +1867,14 @@ function generateRainSamples(durationSec) {
   const sampleRate = 44100;
   const total = Math.floor(sampleRate * durationSec);
   const samples = new Float32Array(total);
-  let last = 0;
+  let brown = 0;
   for (let i = 0; i < total; i++) {
-    const white = Math.random() * 2 - 1;
-    last = (last + (0.015 * white)) / 1.015;
-    const brown = last * 2.5;
-    const drop = (Math.random() > 0.994) ? (Math.random() * 0.12 - 0.06) : 0;
-    samples[i] = Math.max(-1, Math.min(1, (brown * 0.5 + white * 0.02 + drop) * 0.25));
+    const w = Math.random() * 2 - 1;
+    brown = (brown + 0.01 * w) / 1.01;
+    const click = (Math.random() > 0.992)
+      ? Math.sin(Math.random() * 40) * (0.08 + Math.random() * 0.12) * Math.exp(-((i % 200) / 30))
+      : 0;
+    samples[i] = Math.max(-1, Math.min(1, (brown * 3.0 * 0.3 + click + w * 0.01) * 0.3));
   }
   return samples;
 }
