@@ -2085,6 +2085,12 @@ async function parseAndAlarmOnly() {
 
   ensureAudioCtx();
   ensureAlarmCtx();
+
+  // Alarm-only: duration = 1 minute
+  const s = safeParseDate(ev.startDate);
+  const e1 = new Date(s.getTime() + 60000);
+  ev.endDate = e1.getFullYear() + '-' + String(e1.getMonth()+1).padStart(2,'0') + '-' + String(e1.getDate()).padStart(2,'0') + 'T' + String(e1.getHours()).padStart(2,'0') + ':' + String(e1.getMinutes()).padStart(2,'0') + ':00';
+
   addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
@@ -2547,7 +2553,7 @@ function deleteFromHistory(id) {
   let list = getHistory();
   const entry = list.find(e => e.id === id);
 
-  if (entry) {
+  if (entry && !entry.alarmOnly) {
     // Build Google Calendar date view URL
     const d = safeParseDate(entry.startDate);
     const dateStr = d.getFullYear() + '/' +
@@ -2720,8 +2726,14 @@ async function alarmOnly() {
   }
 
   ensureAudioCtx();
-  addToHistory(ev, true);
   ensureAlarmCtx();
+
+  // Alarm-only: duration = 1 minute
+  const s2 = safeParseDate(ev.startDate);
+  const e2 = new Date(s2.getTime() + 60000);
+  ev.endDate = e2.getFullYear() + '-' + String(e2.getMonth()+1).padStart(2,'0') + '-' + String(e2.getDate()).padStart(2,'0') + 'T' + String(e2.getHours()).padStart(2,'0') + ':' + String(e2.getMinutes()).padStart(2,'0') + ':00';
+
+  addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
   const now = Date.now();
