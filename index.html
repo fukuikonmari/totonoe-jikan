@@ -1893,7 +1893,7 @@ function startRain() {
 
   rainProcessor = rainCtx.createScriptProcessor(4096, 0, 1);
   rainGainNode = rainCtx.createGain();
-  rainGainNode.gain.value = 0.55;
+  rainGainNode.gain.value = 1.0;
 
   rainProcessor.onaudioprocess = function(e) {
     const output = e.outputBuffer.getChannelData(0);
@@ -1903,7 +1903,7 @@ function startRain() {
       const click = (Math.random() > 0.992)
         ? Math.sin(Math.random() * 40) * (0.08 + Math.random() * 0.12) * Math.exp(-((i % 200) / 30))
         : 0;
-      output[i] = Math.max(-1, Math.min(1, (rainBrown * 3.0 * 0.3 + click + w * 0.01) * 0.3));
+      output[i] = Math.max(-1, Math.min(1, (rainBrown * 3.0 * 0.5 + click * 2.0 + w * 0.02) * 0.5));
     }
   };
 
