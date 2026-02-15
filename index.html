@@ -876,7 +876,7 @@
   }
   .memo-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     padding: 8px 0;
     border-bottom: 1px solid var(--border);
@@ -885,7 +885,7 @@
   .memo-item:last-child { border-bottom: none; }
   .memo-item-text {
     flex: 1;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.5;
     word-break: break-word;
   }
@@ -893,7 +893,7 @@
     font-size: 10px;
     color: var(--text-dim);
     white-space: nowrap;
-    margin-top: 2px;
+    flex-shrink: 0;
   }
   .memo-item-del {
     background: none;
@@ -2520,7 +2520,7 @@ function renderHistory() {
     const dotClass = isUpcoming ? 'upcoming' : 'past';
     const dateStr = entry.allDay
       ? formatJP(entry.startDate, true) + '（終日）'
-      : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+      : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
     return `<div class="history-item">
       <div class="history-dot ${dotClass}"></div>
       <div class="history-info">
@@ -2628,7 +2628,7 @@ function formatJP(dateStr, allDay) {
 
   if (allDay) return `${y}年${m}月${dd}日（${w}）`;
 
-  const h = String(d.getHours()).padStart(2, '0');
+  const h = String(d.getHours());
   const min = String(d.getMinutes()).padStart(2, '0');
   return `${y}年${m}月${dd}日（${w}） ${h}:${min}`;
 }
@@ -2733,7 +2733,7 @@ async function setReminder(minBefore) {
 function sendNotification(ev, minBefore) {
   const label = minBefore === 0 ? 'まもなく開始' : `あと${minBefore}分`;
   const startTime = safeParseDate(ev.startDate);
-  const h = String(startTime.getHours()).padStart(2, '0');
+  const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
 
   new Notification(`📅 ${ev.title}`, {
@@ -2930,13 +2930,13 @@ function renderMemos() {
 
   let html = list.map(m => {
     const d = new Date(m.createdAt);
-    const time = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     const pinCls = m.pinned ? ' pinned' : '';
     return `<div class="memo-item">
       <div style="flex:1">
         <div class="memo-item-text">${escHTML(m.text)}</div>
-        <div class="memo-item-time">${time}</div>
       </div>
+      <div class="memo-item-time">${time}</div>
       <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
       <button class="memo-item-del" onclick="deleteMemo(${m.id})">✕</button>
     </div>`;
@@ -3070,7 +3070,7 @@ function buildGmailAllUrl() {
   const subject = encodeURIComponent(`メモ一覧 (${dateStr})`);
   const lines = list.map(m => {
     const d = new Date(m.createdAt);
-    const time = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     return `・${m.text}  (${time})`;
   });
   const body = encodeURIComponent(lines.join('\n') + '\n\n— totonoe-jikan');
