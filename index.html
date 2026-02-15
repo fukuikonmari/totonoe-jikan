@@ -1880,7 +1880,7 @@ function generateToneWav(frequencies, durations, volume) {
 
 // Pre-generate sound blobs
 const soundBlobs = {
-  reminder: generateToneWav([880, 1100], [0.3, 0.4], 0.5),
+  reminder: generateToneWav([880, 1100, 880], [0.3, 0.3, 0.4], 0.9),
   'pomo-work': generateToneWav([523, 659, 784], [0.25, 0.25, 0.4], 0.5),
   'pomo-break': generateToneWav([440, 523], [0.3, 0.4], 0.5),
 };
@@ -1892,16 +1892,8 @@ let persistentAudio = null;
 function unlockAudio() {
   if (audioUnlocked) return;
   try {
-    // Create a silent WAV and play it to unlock audio
-    const silentWav = generateToneWav([0], [0.01], 0);
-    const url = URL.createObjectURL(silentWav);
-    persistentAudio = new Audio(url);
-    persistentAudio.volume = 0.01;
-    persistentAudio.play().then(() => {
-      audioUnlocked = true;
-      persistentAudio.pause();
-      URL.revokeObjectURL(url);
-    }).catch(() => {});
+    ensureAudioCtx();
+    audioUnlocked = true;
   } catch(e) {}
 }
 
@@ -1994,6 +1986,26 @@ function ensureAudioCtx() {
     rainCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
   if (rainCtx.state === 'suspended') rainCtx.resume();
+  decodeSoundsIfNeeded();
+}
+
+// Pre-decoded audio buffers for alarm sounds
+let decodedSounds = {};
+let soundsDecoded = false;
+
+function decodeSoundsIfNeeded() {
+  if (soundsDecoded || !rainCtx) return;
+  soundsDecoded = true;
+  Object.keys(soundBlobs).forEach(type => {
+    const blob = soundBlobs[type];
+    const reader = new FileReader();
+    reader.onload = function() {
+      rainCtx.decodeAudioData(reader.result.slice(0), buf => {
+        decodedSounds[type] = buf;
+      }, () => {});
+    };
+    reader.readAsArrayBuffer(blob);
+  });
 }
 
 function playSound(type) {
@@ -2001,20 +2013,26 @@ function playSound(type) {
     if (!rainCtx) return;
     if (rainCtx.state === 'suspended') rainCtx.resume();
 
-    const blob = soundBlobs[type];
-    if (!blob) return;
+    const buf = decodedSounds[type];
+    if (!buf) {
+      // Fallback: try HTML Audio
+      const blob = soundBlobs[type];
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = new Audio(url);
+      a.volume = 1.0;
+      a.play().catch(() => {});
+      a.onended = () => URL.revokeObjectURL(url);
+      return;
+    }
 
-    blob.arrayBuffer().then(buf => {
-      rainCtx.decodeAudioData(buf, audioBuffer => {
-        const source = rainCtx.createBufferSource();
-        const gain = rainCtx.createGain();
-        source.buffer = audioBuffer;
-        gain.gain.value = 1.0;
-        source.connect(gain);
-        gain.connect(rainCtx.destination);
-        source.start(0);
-      });
-    });
+    const source = rainCtx.createBufferSource();
+    const gain = rainCtx.createGain();
+    source.buffer = buf;
+    gain.gain.value = 1.5;
+    source.connect(gain);
+    gain.connect(rainCtx.destination);
+    source.start(0);
   } catch(e) {
     console.warn('Audio error:', e);
   }
@@ -2933,22 +2951,28 @@ function sendNotification(ev, minBefore) {
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
 
-  // Pause rain during alarm
+  // Stop rain before alarm
   const wasRainActive = rainActive;
   if (wasRainActive) stopRain();
 
-  new Notification(`📅 ${ev.title}`, {
-    body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
-    requireInteraction: true,
-  });
+  // Small delay to ensure rain is fully stopped, then play alarm
+  setTimeout(() => {
+    new Notification(`📅 ${ev.title}`, {
+      body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
+      requireInteraction: true,
+    });
 
-  playSound('reminder');
+    playSound('reminder');
 
-  // Resume rain after alarm sound
-  if (wasRainActive && pomoRunning && pomoMode === 'work') {
-    setTimeout(() => { startRain(); }, 3000);
-  }
+    // Resume rain after alarm sound finishes
+    if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
+      setTimeout(() => {
+        rainActive = false;
+        startRain();
+      }, 2000);
+    }
+  }, 200);
 }
 
 function updateReminderChips() {
@@ -3397,6 +3421,7 @@ function pomoToggle() {
 
 function pomoStart() {
   pomoRunning = true;
+  ensureAudioCtx();
   if (!pomoCurrentStart) pomoCurrentStart = new Date();
   document.getElementById('pomoStartBtn').innerHTML = '⏸';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
