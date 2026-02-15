@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="totonoe-jikan">
 <title>ととのえ時間−今日が成長＆ときめきの１日になりますように</title>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   input, textarea, button, select { -webkit-appearance: none; appearance: none; }
@@ -906,6 +906,102 @@
     transition: opacity 0.2s;
   }
   .memo-item-del:hover { opacity: 1; color: #f87171; }
+  .memo-item-pin {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    opacity: 0.4;
+    transition: all 0.2s;
+  }
+  .memo-item-pin:hover { opacity: 1; }
+  .memo-item-pin.pinned { opacity: 1; color: var(--accent); }
+
+  /* Pinned section */
+  .pinned-section {
+    margin-top: -4px;
+    margin-bottom: 10px;
+    animation: slideUp 0.5s ease both;
+  }
+  .pinned-card {
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .pinned-header {
+    margin-bottom: 6px;
+  }
+  .pinned-title {
+    font-size: 14px;
+    
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .pinned-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pinned-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .pinned-item:active { cursor: grabbing; }
+  .pinned-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+  .pinned-item.drag-over {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.08);
+  }
+  .pinned-item-text {
+    flex: 1;
+    word-break: break-word;
+    outline: none;
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin: -1px -4px;
+    transition: background 0.2s;
+  }
+  .pinned-item-text:focus {
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .pinned-item-grip {
+    color: var(--text-dim);
+    opacity: 0.4;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .pinned-item-unpin {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 2px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .pinned-item-unpin:hover { opacity: 1; color: #f87171; }
   a.memo-gmail-btn {
     display: flex;
     align-items: center;
@@ -1188,8 +1284,9 @@
     top: 28%;
     left: 50%;
     transform: translateX(-50%);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 8px;
+    font-family: 'EB Garamond', serif;
+    font-size: 10px;
+    font-weight: 600;
     letter-spacing: 2px;
     color: var(--text-dim);
     text-transform: uppercase;
@@ -1390,13 +1487,22 @@
   <!-- Header -->
   <div class="header">
     <div class="logo">
-      <div class="logo-icon">📅</div>
+      <div class="logo-icon">⏰</div>
       <span class="logo-text">totonoe-jikan</span>
     </div>
   </div>
 
   <!-- ═══ INPUT PHASE ═══ -->
   <div id="inputPhase" class="phase active">
+    <!-- Pinned Memos -->
+    <div class="pinned-section" id="pinnedSection" style="display:none">
+      <div class="pinned-card">
+        <div class="pinned-header">
+          <span class="pinned-title">📌 ワクワクリスト</span>
+        </div>
+        <div class="pinned-list" id="pinnedList"></div>
+      </div>
+    </div>
     <!-- Pomodoro Timer -->
     <div class="pomo-section">
       <div class="pomo-card">
@@ -2737,7 +2843,7 @@ function addMemo() {
   const text = input.value.trim();
   if (!text) return;
   const list = getMemos();
-  list.unshift({ id: Date.now(), text, createdAt: new Date().toISOString() });
+  list.unshift({ id: Date.now(), text, createdAt: new Date().toISOString(), pinned: false, pinOrder: 0 });
   if (list.length > 100) list.length = 100;
   saveMemos(list);
   input.value = '';
@@ -2747,6 +2853,42 @@ function addMemo() {
 function deleteMemo(id) {
   let list = getMemos();
   list = list.filter(m => m.id !== id);
+  saveMemos(list);
+  renderMemos();
+}
+
+function togglePin(id) {
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo) return;
+  memo.pinned = !memo.pinned;
+  if (memo.pinned) {
+    const pinned = list.filter(m => m.pinned);
+    memo.pinOrder = pinned.length;
+  } else {
+    memo.pinOrder = 0;
+  }
+  saveMemos(list);
+  renderMemos();
+}
+
+function unpinMemo(id) {
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo) return;
+  memo.pinned = false;
+  memo.pinOrder = 0;
+  saveMemos(list);
+  renderMemos();
+}
+
+function editPinnedMemo(id, el) {
+  const newText = el.textContent.trim();
+  if (!newText) return;
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo || memo.text === newText) return;
+  memo.text = newText;
   saveMemos(list);
   renderMemos();
 }
@@ -2763,6 +2905,25 @@ function renderMemos() {
   const clearBtn = document.getElementById('memoClearBtn');
   clearBtn.style.display = list.length > 1 ? 'block' : 'none';
 
+  // Render pinned area
+  const pinnedMemos = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  const pinnedSection = document.getElementById('pinnedSection');
+  const pinnedList = document.getElementById('pinnedList');
+
+  if (pinnedMemos.length > 0) {
+    pinnedSection.style.display = '';
+    pinnedList.innerHTML = pinnedMemos.map(m => `<div class="pinned-item" draggable="true" data-id="${m.id}">
+      <span class="pinned-item-grip">⠿</span>
+      <span class="pinned-item-text" contenteditable="true" onblur="editPinnedMemo(${m.id}, this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escHTML(m.text)}</span>
+      <button class="pinned-item-unpin" onclick="unpinMemo(${m.id})" title="ピン解除">✕</button>
+    </div>`).join('');
+    initPinnedDrag();
+  } else {
+    pinnedSection.style.display = 'none';
+    pinnedList.innerHTML = '';
+  }
+
+  // Render memo list
   if (list.length === 0) {
     el.innerHTML = '';
     return;
@@ -2771,11 +2932,13 @@ function renderMemos() {
   let html = list.map(m => {
     const d = new Date(m.createdAt);
     const time = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const pinCls = m.pinned ? ' pinned' : '';
     return `<div class="memo-item">
       <div style="flex:1">
         <div class="memo-item-text">${escHTML(m.text)}</div>
         <div class="memo-item-time">${time}</div>
       </div>
+      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
       <button class="memo-item-del" onclick="deleteMemo(${m.id})">✕</button>
     </div>`;
   }).join('');
@@ -2783,6 +2946,121 @@ function renderMemos() {
   html += `<a class="memo-gmail-btn" href="${buildGmailAllUrl()}">✉️ メールで送る</a>`;
 
   el.innerHTML = html;
+}
+
+// Drag-to-reorder for pinned memos
+let dragSrcId = null;
+
+function initPinnedDrag() {
+  const items = document.querySelectorAll('.pinned-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', handleDragStart);
+    item.addEventListener('dragend', handleDragEnd);
+    item.addEventListener('dragover', handleDragOver);
+    item.addEventListener('dragenter', handleDragEnter);
+    item.addEventListener('dragleave', handleDragLeave);
+    item.addEventListener('drop', handleDrop);
+    // Touch support
+    item.addEventListener('touchstart', handleTouchStart, { passive: false });
+    item.addEventListener('touchmove', handleTouchMove, { passive: false });
+    item.addEventListener('touchend', handleTouchEnd);
+  });
+}
+
+function handleDragStart(e) {
+  if (e.target.isContentEditable) { e.preventDefault(); return; }
+  dragSrcId = Number(this.dataset.id);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over'));
+}
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+function handleDragEnter(e) {
+  e.preventDefault();
+  this.classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetId = Number(this.dataset.id);
+  if (dragSrcId === targetId) return;
+  reorderPinned(dragSrcId, targetId);
+}
+
+// Touch drag support
+let touchDragEl = null;
+let touchClone = null;
+let touchStartY = 0;
+
+function handleTouchStart(e) {
+  if (e.target.closest('.pinned-item-unpin') || e.target.isContentEditable) return;
+  touchDragEl = this;
+  dragSrcId = Number(this.dataset.id);
+  touchStartY = e.touches[0].clientY;
+  this.touchTimer = setTimeout(() => {
+    this.classList.add('dragging');
+    touchClone = this.cloneNode(true);
+    touchClone.style.cssText = 'position:fixed;left:0;right:0;margin:0 20px;opacity:0.8;z-index:9999;pointer-events:none;transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,0.3);';
+    touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
+    document.body.appendChild(touchClone);
+  }, 200);
+}
+function handleTouchMove(e) {
+  if (!touchDragEl) return;
+  if (!touchClone) {
+    if (Math.abs(e.touches[0].clientY - touchStartY) < 10) return;
+    clearTimeout(touchDragEl.touchTimer);
+    touchDragEl = null;
+    return;
+  }
+  e.preventDefault();
+  touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
+  const target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over'));
+  const item = target ? target.closest('.pinned-item') : null;
+  if (item && item !== touchDragEl) item.classList.add('drag-over');
+}
+function handleTouchEnd(e) {
+  clearTimeout(touchDragEl?.touchTimer);
+  if (touchClone) {
+    touchClone.remove();
+    touchClone = null;
+    const touch = e.changedTouches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const item = target ? target.closest('.pinned-item') : null;
+    if (item && Number(item.dataset.id) !== dragSrcId) {
+      reorderPinned(dragSrcId, Number(item.dataset.id));
+    } else {
+      if (touchDragEl) touchDragEl.classList.remove('dragging');
+    }
+  }
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over', 'dragging'));
+  touchDragEl = null;
+}
+
+function reorderPinned(srcId, targetId) {
+  const list = getMemos();
+  const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  const srcIdx = pinned.findIndex(m => m.id === srcId);
+  const tgtIdx = pinned.findIndex(m => m.id === targetId);
+  if (srcIdx === -1 || tgtIdx === -1) return;
+  const [moved] = pinned.splice(srcIdx, 1);
+  pinned.splice(tgtIdx, 0, moved);
+  pinned.forEach((m, i) => {
+    const orig = list.find(o => o.id === m.id);
+    if (orig) orig.pinOrder = i;
+  });
+  saveMemos(list);
+  renderMemos();
 }
 
 function buildGmailAllUrl() {
