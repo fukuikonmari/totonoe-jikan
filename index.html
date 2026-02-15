@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="totonoe-jikan">
 <link rel="apple-touch-icon" href="totonoe-jikan.png">
 <link rel="icon" type="image/png" href="totonoe-jikan.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E1A">
 <title>ととのえ時間−今日が成長＆ときめきの１日になりますように</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -3426,6 +3428,13 @@ function setTheme(theme) {
     if (saved) setTheme(saved);
   } catch(e) {}
 })();
+
+// ════════════════════════════════════════
+//  Service Worker (PWA)
+// ════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
