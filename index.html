@@ -1776,6 +1776,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
+  <div style="text-align:center;font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;letter-spacing:0.5px;margin-top:2px">v2026.02.16.01</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2625,11 +2626,10 @@ function renderHistory() {
       : entry.alarmOnly
         ? formatJP(entry.startDate, false)
         : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
-    const alarmBadge = entry.alarmOnly ? '<span style="font-size:10px;color:#F59E0B;margin-left:4px">🔔</span>' : '';
     return `<div class="history-item">
       <div class="history-dot ${dotClass}"></div>
       <div class="history-info">
-        <div class="history-info-title">${hasReminder(entry.startDate) ? '<span class="history-bell">🔔</span>' : ''}${escHTML(entry.title)}${alarmBadge}</div>
+        <div class="history-info-title">${hasReminder(entry.startDate) ? '<span class="history-bell">🔔</span>' : ''}${escHTML(entry.title)}</div>
         <div class="history-info-date">${escHTML(dateStr)}${entry.location ? ' 📍' + escHTML(entry.location) : ''}</div>
       </div>
       <div class="history-actions">
@@ -3735,6 +3735,5 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>
-<div style="text-align:center;padding:4px 0;font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;letter-spacing:0.5px">v2026.02.16.01</div>
 </body>
 </html>
