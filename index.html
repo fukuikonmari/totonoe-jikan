@@ -1655,7 +1655,7 @@
       </div>
       <button class="btn-alarm-only" id="alarmOnlyBtn" onclick="parseAndAlarmOnly()" disabled style="margin-bottom:8px">
         <span style="font-size:18px">🔔</span>
-        アラームのみ
+        アラーム
       </button>
       <button class="btn-primary" id="parseBtn" onclick="parseInput()" disabled>
         <span style="font-size:20px">📅</span>
@@ -1734,7 +1734,7 @@
       <div class="result-actions">
         <button class="btn-alarm-only" onclick="alarmOnly()">
           <span style="font-size:18px">🔔</span>
-          アラームのみ
+          アラーム
         </button>
         <button class="btn-gcal" onclick="openGoogleCalendar()">
           <span style="font-size:18px">📅</span>
@@ -2633,7 +2633,7 @@ function renderHistory() {
         <div class="history-info-date">${escHTML(dateStr)}${entry.location ? ' 📍' + escHTML(entry.location) : ''}</div>
       </div>
       <div class="history-actions">
-        <button class="history-btn" onclick="reopenFromHistory(${entry.id})" title="詳細を見る">📅</button>
+        ${entry.alarmOnly ? '' : '<button class="history-btn" onclick="reopenFromHistory(' + entry.id + ')" title="詳細を見る">📅</button>'}
         <button class="history-btn delete" onclick="deleteFromHistory(${entry.id})" title="削除">✕</button>
       </div>
     </div>`;
@@ -3735,6 +3735,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>
-<div style="text-align:center;padding:12px 0 8px;font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;letter-spacing:0.5px">v2026.02.16.01</div>
+<div style="text-align:center;padding:4px 0;font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;letter-spacing:0.5px">v2026.02.16.01</div>
 </body>
 </html>
