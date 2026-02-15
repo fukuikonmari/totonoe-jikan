@@ -1565,7 +1565,7 @@
       <div class="pomo-card">
         <div class="pomo-header">
           <span class="pomo-title">🍅 ポモドーロタイマー</span>
-          <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="playSound('pomo-work')">🔊 テスト</button>
+          <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="ensureAudioCtx();playSound('pomo-work')">🔊 テスト</button>
           <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="toggleTickMute()">🔈 雨音</button>
         </div>
         <div class="pomo-main">
@@ -1921,10 +1921,7 @@ let rainBrown = 0;
 
 function startRain() {
   if (pomoTickMuted || rainActive || pomoRestoring) return;
-  if (!rainCtx) {
-    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (rainCtx.state === 'suspended') rainCtx.resume();
+  ensureAudioCtx();
   rainActive = true;
   rainBrown = 0;
 
@@ -1991,18 +1988,32 @@ function toggleTickMute() {
   }
 }
 
+// Ensure AudioContext exists (call from user gesture to unlock)
+function ensureAudioCtx() {
+  if (!rainCtx) {
+    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (rainCtx.state === 'suspended') rainCtx.resume();
+}
+
 function playSound(type) {
   try {
+    if (!rainCtx) return;
+    if (rainCtx.state === 'suspended') rainCtx.resume();
+
     const blob = soundBlobs[type];
     if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.volume = 1.0;
-    audio.play().then(() => {
-      audio.onended = () => URL.revokeObjectURL(url);
-    }).catch(e => {
-      console.warn('Audio play failed:', e);
-      URL.revokeObjectURL(url);
+
+    blob.arrayBuffer().then(buf => {
+      rainCtx.decodeAudioData(buf, audioBuffer => {
+        const source = rainCtx.createBufferSource();
+        const gain = rainCtx.createGain();
+        source.buffer = audioBuffer;
+        gain.gain.value = 1.0;
+        source.connect(gain);
+        gain.connect(rainCtx.destination);
+        source.start(0);
+      });
     });
   } catch(e) {
     console.warn('Audio error:', e);
@@ -2103,6 +2114,7 @@ async function parseAndAlarmOnly() {
     return;
   }
 
+  ensureAudioCtx();
   addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
@@ -2737,6 +2749,7 @@ async function alarmOnly() {
     return;
   }
 
+  ensureAudioCtx();
   addToHistory(ev, true);
 
   const eventTime = safeParseDate(ev.startDate).getTime();
@@ -2884,6 +2897,8 @@ async function setReminder(minBefore) {
     renderHistory();
     return;
   }
+
+  ensureAudioCtx();
 
   // Calculate fire time
   const eventTime = safeParseDate(ev.startDate).getTime();
