@@ -449,7 +449,36 @@
   .result-actions {
     padding: 20px 28px 28px;
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
+  }
+  .btn-alarm-only {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #F59E0B;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-alarm-only:hover {
+    background: rgba(245, 158, 11, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(245,158,11,0.25);
+  }
+  .btn-alarm-only:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
   .btn-gcal {
     flex: 1;
@@ -578,7 +607,7 @@
     .result-header { padding: 18px 20px 16px; }
     .result-body { padding: 18px 20px; }
     .result-actions { padding: 16px 20px 22px; flex-direction: column; }
-    .btn-gcal, .btn-ics { width: 100%; justify-content: center; }
+    .btn-gcal, .btn-ics, .btn-alarm-only { width: 100%; justify-content: center; }
     .edit-section { padding: 16px 20px; }
     .reminder-section { padding: 14px 20px; }
     .history-item { padding: 12px 14px; }
@@ -1624,6 +1653,10 @@
           <span id="placeholderText"></span><span class="placeholder-cursor"></span>
         </div>
       </div>
+      <button class="btn-alarm-only" id="alarmOnlyBtn" onclick="parseAndAlarmOnly()" disabled style="margin-bottom:8px">
+        <span style="font-size:18px">🔔</span>
+        アラームのみ
+      </button>
       <button class="btn-primary" id="parseBtn" onclick="parseInput()" disabled>
         <span style="font-size:20px">📅</span>
         カレンダーに登録
@@ -1699,6 +1732,10 @@
       </div>
 
       <div class="result-actions">
+        <button class="btn-alarm-only" onclick="alarmOnly()">
+          <span style="font-size:18px">🔔</span>
+          アラームのみ
+        </button>
         <button class="btn-gcal" onclick="openGoogleCalendar()">
           <span style="font-size:18px">📅</span>
           Googleカレンダーに追加
@@ -2008,8 +2045,10 @@ function updatePlaceholder() {
   const ta = document.getElementById('userInput');
   const overlay = document.getElementById('placeholderOverlay');
   const btn = document.getElementById('parseBtn');
+  const alarmBtn = document.getElementById('alarmOnlyBtn');
   overlay.style.display = ta.value ? 'none' : 'block';
   btn.disabled = !ta.value.trim();
+  alarmBtn.disabled = !ta.value.trim();
 }
 
 // ════════════════════════════════════════
@@ -2028,6 +2067,86 @@ function parseInput() {
     document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
     document.getElementById('errorMsg').style.display = 'block';
   }
+}
+
+async function parseAndAlarmOnly() {
+  const text = document.getElementById('userInput').value.trim();
+  if (!text) return;
+
+  document.getElementById('errorMsg').style.display = 'none';
+
+  try {
+    currentEvent = parseJapaneseEvent(text);
+  } catch (e) {
+    document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  // Set alarms directly without showing result screen
+  const ev = currentEvent;
+  if (ev.allDay) {
+    document.getElementById('errorMsg').textContent = '終日イベントにはアラームを設定できません';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  const perm = await requestNotificationPermission();
+  if (perm === 'unsupported') {
+    document.getElementById('errorMsg').textContent = 'このブラウザは通知に対応していません';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+  if (perm === 'denied') {
+    document.getElementById('errorMsg').textContent = 'ブラウザの通知がブロックされています。設定から許可してください';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  addToHistory(ev);
+
+  const eventTime = safeParseDate(ev.startDate).getTime();
+  const now = Date.now();
+
+  if (eventTime - 5 * 60 * 1000 > now) {
+    const tid5 = setTimeout(() => {
+      sendNotification(ev, 5);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 5 || r.eventStart !== ev.startDate);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, eventTime - 5 * 60 * 1000 - now);
+    activeReminders.push({ timerId: tid5, minBefore: 5, fireTime: eventTime - 5 * 60 * 1000, eventStart: ev.startDate });
+  }
+
+  if (eventTime > now) {
+    const tid0 = setTimeout(() => {
+      sendNotification(ev, 0);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 0 || r.eventStart !== ev.startDate);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, eventTime - now);
+    activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+  }
+
+  renderHistory();
+
+  const startTime = safeParseDate(ev.startDate);
+  const h = String(startTime.getHours());
+  const m = String(startTime.getMinutes()).padStart(2, '0');
+
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('userInput').value = '';
+  updatePlaceholder();
+  updateClearBtn();
+
+  // Show confirmation briefly
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'block';
+  errEl.style.color = '#2DD4BF';
+  errEl.textContent = `🔔 ${ev.title}（${h}:${m}）の5分前と開始時にアラーム設定済み`;
+  setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = ''; }, 3000);
 }
 
 function parseJapaneseEvent(text) {
@@ -2595,6 +2714,71 @@ function downloadICS() {
   a.download = ev.title + '.ics';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+async function alarmOnly() {
+  const ev = getEditedEvent();
+  if (ev.allDay) {
+    showReminderStatus('error', '終日イベントにはアラームを設定できません');
+    return;
+  }
+
+  const perm = await requestNotificationPermission();
+  if (perm === 'unsupported') {
+    showReminderStatus('error', 'このブラウザは通知に対応していません');
+    return;
+  }
+  if (perm === 'denied') {
+    showReminderStatus('error', 'ブラウザの通知がブロックされています。設定から許可してください');
+    return;
+  }
+
+  addToHistory(ev);
+
+  const eventTime = safeParseDate(ev.startDate).getTime();
+  const now = Date.now();
+
+  // Set 5-min-before alarm
+  const fire5 = eventTime - 5 * 60 * 1000;
+  if (fire5 > now) {
+    const existing5 = activeReminders.find(r => r.minBefore === 5);
+    if (!existing5) {
+      const tid5 = setTimeout(() => {
+        sendNotification(ev, 5);
+        activeReminders = activeReminders.filter(r => r.minBefore !== 5);
+        updateReminderChips();
+        updateReminderStatusText();
+        renderHistory();
+      }, fire5 - now);
+      activeReminders.push({ timerId: tid5, minBefore: 5, fireTime: fire5, eventStart: ev.startDate });
+    }
+  }
+
+  // Set start-time alarm
+  if (eventTime > now) {
+    const existing0 = activeReminders.find(r => r.minBefore === 0);
+    if (!existing0) {
+      const tid0 = setTimeout(() => {
+        sendNotification(ev, 0);
+        activeReminders = activeReminders.filter(r => r.minBefore !== 0);
+        updateReminderChips();
+        updateReminderStatusText();
+        renderHistory();
+      }, eventTime - now);
+      activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+    }
+  }
+
+  updateReminderChips();
+  renderHistory();
+
+  const startTime = safeParseDate(ev.startDate);
+  const h = String(startTime.getHours());
+  const m = String(startTime.getMinutes()).padStart(2, '0');
+  showReminderStatus('success', `🔔 ${ev.title}（${h}:${m}）の5分前と開始時にアラームを設定しました`);
+
+  // Go back to input after short delay
+  setTimeout(() => { goBack(); }, 1500);
 }
 
 
