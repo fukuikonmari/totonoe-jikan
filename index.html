@@ -584,9 +584,10 @@
     .pomo-ring { width: 150px; height: 150px; }
     .pomo-time-text { font-size: 40px; }
     .pomo-btn { font-size: 11px; padding: 7px 10px; }
-    .memo-card { padding: 14px; }
-    .memo-input { font-size: 12px; padding: 8px 12px; }
-    .memo-add-btn { font-size: 12px; padding: 8px 12px; }
+    .memo-card { padding: 12px; }
+    .memo-input-row { gap: 6px; }
+    .memo-input { font-size: 16px; padding: 8px 10px; }
+    .memo-add-btn { font-size: 12px; padding: 8px 10px; }
   }
 
   /* Reminder */
@@ -799,12 +800,16 @@
     margin-top: 20px;
     margin-bottom: 28px;
     animation: slideUp 0.7s 0.1s ease both;
+    overflow: hidden;
   }
   .memo-card {
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: 14px;
     padding: 16px 18px;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
   }
   .memo-header {
     display: flex;
@@ -822,15 +827,21 @@
   .memo-input-row {
     display: flex;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .memo-input {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 9px 14px;
     border-radius: 10px;
     border: 1.5px solid var(--border);
     background: var(--surface2);
     color: var(--text);
-    font-size: 13px;
+    font-size: 16px;
     font-family: 'Noto Sans JP', sans-serif;
     outline: none;
     transition: border-color 0.2s;
@@ -843,7 +854,7 @@
     opacity: 0.5;
   }
   .memo-add-btn {
-    padding: 9px 16px;
+    padding: 9px 14px;
     border-radius: 10px;
     border: none;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -854,6 +865,7 @@
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .memo-add-btn:hover {
     transform: translateY(-1px);
@@ -1485,7 +1497,7 @@
           <button class="memo-clear-btn" id="memoClearBtn" style="display:none" onclick="clearAllMemos()">すべて削除</button>
         </div>
         <div class="memo-input-row">
-          <input class="memo-input" id="memoInput" type="text" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
+          <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
           <button class="memo-add-btn" onclick="addMemo()">追加</button>
         </div>
         <div class="memo-list" id="memoList"></div>
