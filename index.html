@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-15.10</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.17-15.25</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3495,7 +3495,12 @@ function restorePomoState() {
     const data = JSON.parse(localStorage.getItem('aical_pomo_state'));
     if (!data) return;
     pomoMode = data.mode || 'work';
-    pomoSessions = data.sessions || 0;
+
+    // Only restore sessions if saved today, otherwise use ganttLoad's count
+    if (data.savedAt && new Date(data.savedAt).toDateString() === new Date().toDateString()) {
+      pomoSessions = data.sessions || 0;
+    }
+
     if (data.currentStart) pomoCurrentStart = new Date(data.currentStart);
 
     if (data.running && data.savedAt) {
@@ -3865,14 +3870,25 @@ function ganttInitTicks() {
 
 function ganttSave() {
   try {
-    const data = pomoLog.map(l => ({ s: l.startTime.getTime(), e: l.endTime.getTime(), m: l.mode }));
-    localStorage.setItem('aical_pomo_log', JSON.stringify(data));
+    // Merge today's log with stored recent logs, then prune >7 days
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const stored = JSON.parse(localStorage.getItem('aical_pomo_log') || '[]')
+      .filter(d => d.s > cutoff);
+    const todayStr = new Date().toDateString();
+    // Remove today's old entries from stored, replace with current pomoLog
+    const kept = stored.filter(d => new Date(d.s).toDateString() !== todayStr);
+    const todayData = pomoLog.map(l => ({ s: l.startTime.getTime(), e: l.endTime.getTime(), m: l.mode }));
+    localStorage.setItem('aical_pomo_log', JSON.stringify([...kept, ...todayData]));
   } catch(e) {}
 }
 
 function ganttLoad() {
   try {
-    const data = JSON.parse(localStorage.getItem('aical_pomo_log') || '[]');
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const data = JSON.parse(localStorage.getItem('aical_pomo_log') || '[]')
+      .filter(d => d.s > cutoff);
+    // Save pruned data back
+    localStorage.setItem('aical_pomo_log', JSON.stringify(data));
     const today = new Date().toDateString();
     pomoLog = data
       .map(d => ({ startTime: new Date(d.s), endTime: new Date(d.e), mode: d.m }))
@@ -3891,19 +3907,34 @@ pomoUpdateDisplay();
 // Save state when leaving page
 window.addEventListener('beforeunload', savePomoState);
 
+// Track current day for reset detection
+let lastKnownDate = new Date().toDateString();
+
+function checkDayChange() {
+  const today = new Date().toDateString();
+  if (today !== lastKnownDate) {
+    lastKnownDate = today;
+    ganttLoad();
+    ganttRender();
+  }
+}
+
 // Detect wake from sleep via visibility change
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && pomoRunning) {
-    pomoLastTick = Date.now();
-    ganttRender();
+  if (document.visibilityState === 'visible') {
+    checkDayChange();
+    if (pomoRunning) {
+      pomoLastTick = Date.now();
+      ganttRender();
+    }
   }
 });
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') savePomoState();
 });
 
-// Update now-line every minute
-setInterval(() => { if (!pomoRunning) ganttRender(); }, 60000);
+// Update now-line every minute + check day change
+setInterval(() => { checkDayChange(); if (!pomoRunning) ganttRender(); }, 60000);
 
 // ════════════════════════════════════════
 //  Theme
