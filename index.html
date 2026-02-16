@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.17-15.25</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.17-06.17</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3658,6 +3658,7 @@ function pomoPause() {
         mode: pomoMode,
       });
       ganttSave();
+      pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
     }
     pomoCurrentStart = null;
   }
@@ -3674,13 +3675,14 @@ function pomoReset() {
   // Log partial session
   if (pomoCurrentStart) {
     const elapsed = POMO_MODES[pomoMode].duration - pomoTimeLeft;
-    if (elapsed >= 60) { // Only log if at least 1 min
+    if (elapsed >= 60) {
       pomoLog.push({
         startTime: pomoCurrentStart,
         endTime: new Date(),
         mode: pomoMode,
       });
       ganttSave();
+      pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
     }
     pomoCurrentStart = null;
   }
@@ -3700,10 +3702,6 @@ function pomoComplete() {
 
   const prevMode = pomoMode;
 
-  if (prevMode === 'work') {
-    pomoSessions++;
-  }
-
   // Log session
   const completedAt = new Date();
   try {
@@ -3717,6 +3715,8 @@ function pomoComplete() {
       ganttSave();
     }
   } catch(e) { console.warn('Log error:', e); }
+
+  pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
 
   // Notification
   try {
