@@ -3392,6 +3392,7 @@ let pomoInterval = null;
 let pomoSessions = 0;
 let pomoLog = []; // {startTime, endTime, mode}
 let pomoCurrentStart = null;
+let pomoLastTick = 0;
 
 function savePomoState() {
   try {
@@ -3490,13 +3491,51 @@ function pomoStart() {
   pomoRunning = true;
   ensureAudioCtx();
   if (!pomoCurrentStart) pomoCurrentStart = new Date();
+  pomoLastTick = Date.now();
   document.getElementById('pomoStartBtn').innerHTML = '⏸';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
   if (pomoMode === 'work') startRain(); else stopRain();
   savePomoState();
 
   pomoInterval = setInterval(() => {
-    pomoTimeLeft--;
+    const now = Date.now();
+    const gap = now - pomoLastTick;
+    pomoLastTick = now;
+
+    // Sleep detection: gap > 3s means phone slept
+    if (gap > 3000) {
+      const sleepStart = new Date(now - gap);
+      // Log the pre-sleep portion
+      if (pomoCurrentStart) {
+        const elapsed = (sleepStart - pomoCurrentStart) / 1000;
+        if (elapsed >= 60) {
+          pomoLog.push({
+            startTime: pomoCurrentStart,
+            endTime: sleepStart,
+            mode: pomoMode,
+          });
+          ganttSave();
+        }
+      }
+
+      // Check if timer should have completed during sleep
+      const realElapsed = Math.round((now - pomoCurrentStart.getTime()) / 1000);
+      const totalDuration = POMO_MODES[pomoMode].duration;
+      if (realElapsed >= totalDuration) {
+        pomoTimeLeft = 0;
+        pomoCurrentStart = null;
+        pomoUpdateDisplay();
+        pomoComplete();
+        return;
+      }
+
+      // Still time left: adjust and start new segment from now
+      pomoTimeLeft = totalDuration - realElapsed;
+      pomoCurrentStart = new Date();
+    } else {
+      pomoTimeLeft--;
+    }
+
     if (pomoTimeLeft <= 0) {
       pomoTimeLeft = 0;
       pomoUpdateDisplay();
@@ -3670,13 +3709,6 @@ function ganttRender() {
     block.style.left = left + '%';
     block.style.width = width + '%';
 
-    const dur = Math.round((log.endTime - log.startTime) / 60000);
-    if (width > 4) {
-      const label = document.createElement('div');
-      label.className = 'pomo-gantt-block-label';
-      label.textContent = dur + '分';
-      block.appendChild(label);
-    }
     bar.appendChild(block);
   });
 
@@ -3759,6 +3791,14 @@ pomoUpdateDisplay();
 
 // Save state when leaving page
 window.addEventListener('beforeunload', savePomoState);
+
+// Detect wake from sleep via visibility change
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && pomoRunning) {
+    pomoLastTick = Date.now();
+    ganttRender();
+  }
+});
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') savePomoState();
 });
