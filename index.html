@@ -1626,7 +1626,7 @@
         <div class="pomo-header">
           <span class="pomo-title">🍅 ポモドーロタイマー</span>
           <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="ensureAudioCtx();playSound('pomo-work')">🔊 テスト</button>
-          <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="toggleTickMute()">🔈 雨音</button>
+          <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="cycleAmbient()">🌧 雨音</button>
         </div>
         <div class="pomo-main">
           <div class="pomo-modes-top">
@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-14.00</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-14.35</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1933,13 +1933,14 @@ function unlockAudio() {
 
 // Generate rain noise (looping white noise with filtering)
 // ════════════════════════════════════════
-//  Rain Audio (Real-time generation - no loops, no seams)
+//  Ambient Audio (Rain / Campfire)
 // ════════════════════════════════════════
 let rainCtx = null;
 let rainProcessor = null;
 let rainGainNode = null;
 let rainActive = false;
 let rainBrown = 0;
+let ambientType = 'rain'; // 'rain', 'fire'
 
 function startRain() {
   if (pomoTickMuted || rainActive || pomoRestoring) return;
@@ -1951,20 +1952,44 @@ function startRain() {
   rainGainNode = rainCtx.createGain();
   rainGainNode.gain.value = 1.0;
 
-  rainProcessor.onaudioprocess = function(e) {
-    const output = e.outputBuffer.getChannelData(0);
-    for (let i = 0; i < output.length; i++) {
-      const w = Math.random() * 2 - 1;
-      rainBrown = (rainBrown + 0.01 * w) / 1.01;
-      const click = (Math.random() > 0.992)
-        ? Math.sin(Math.random() * 40) * (0.08 + Math.random() * 0.12) * Math.exp(-((i % 200) / 30))
-        : 0;
-      output[i] = Math.max(-1, Math.min(1, (rainBrown * 3.0 * 0.5 + click * 2.0 + w * 0.02) * 0.5));
-    }
-  };
+  if (ambientType === 'rain') {
+    rainProcessor.onaudioprocess = function(e) {
+      const output = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < output.length; i++) {
+        const w = Math.random() * 2 - 1;
+        rainBrown = (rainBrown + 0.01 * w) / 1.01;
+        const click = (Math.random() > 0.992)
+          ? Math.sin(Math.random() * 40) * (0.08 + Math.random() * 0.12) * Math.exp(-((i % 200) / 30))
+          : 0;
+        output[i] = Math.max(-1, Math.min(1, (rainBrown * 3.0 * 0.5 + click * 2.0 + w * 0.02) * 0.5));
+      }
+    };
+    rainProcessor.connect(rainGainNode);
+    rainGainNode.connect(rainCtx.destination);
 
-  rainProcessor.connect(rainGainNode);
-  rainGainNode.connect(rainCtx.destination);
+  } else if (ambientType === 'fire') {
+    rainProcessor.onaudioprocess = function(e) {
+      const output = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < output.length; i++) {
+        const w = Math.random() * 2 - 1;
+        rainBrown = (rainBrown + 0.001 * w) / 1.001;
+        let crackle = 0;
+        if (Math.random() > 0.99985) {
+          crackle = (Math.random() * 2 - 1) * (0.5 + Math.random() * 0.5);
+        }
+        let pop = 0;
+        if (Math.random() > 0.9997) {
+          const f = 200 + Math.random() * 500;
+          pop = Math.sin(2 * Math.PI * f * (i % 150) / rainCtx.sampleRate) * 0.35 * Math.exp(-((i % 150) / 30));
+        }
+        const hiss = w * 0.005;
+        const flicker = 1 + 0.1 * Math.sin(i * 0.0003 + Math.random() * 0.01);
+        output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.15 + crackle + pop + hiss) * flicker * 1.2));
+      }
+    };
+    rainProcessor.connect(rainGainNode);
+    rainGainNode.connect(rainCtx.destination);
+  }
 }
 
 function stopRain() {
@@ -1998,15 +2023,34 @@ function setupAudioResume() {
   document.addEventListener('touchstart', resumeAudio);
 }
 
-function toggleTickMute() {
-  pomoTickMuted = !pomoTickMuted;
+const AMBIENT_CYCLE = [
+  { type: 'rain',  icon: '🌧', label: '雨音' },
+  { type: 'fire',  icon: '🔥', label: '焚き火' },
+  { type: 'mute',  icon: '🔇', label: '消音' },
+];
+
+function cycleAmbient() {
+  const currentIdx = AMBIENT_CYCLE.findIndex(a =>
+    pomoTickMuted ? a.type === 'mute' : a.type === ambientType
+  );
+  const nextIdx = (currentIdx + 1) % AMBIENT_CYCLE.length;
+  const next = AMBIENT_CYCLE[nextIdx];
   const btn = document.getElementById('tickMuteBtn');
-  btn.textContent = pomoTickMuted ? '🔇 雨音' : '🔈 雨音';
-  btn.style.color = pomoTickMuted ? '#f87171' : 'var(--text-dim)';
-  if (pomoTickMuted) {
-    stopRain();
-  } else if (pomoRunning && pomoMode === 'work') {
-    startRain();
+
+  stopRain();
+
+  if (next.type === 'mute') {
+    pomoTickMuted = true;
+    btn.textContent = next.icon + ' ' + next.label;
+    btn.style.color = '#f87171';
+  } else {
+    pomoTickMuted = false;
+    ambientType = next.type;
+    btn.textContent = next.icon + ' ' + next.label;
+    btn.style.color = 'var(--text-dim)';
+    if (pomoRunning && pomoMode === 'work') {
+      startRain();
+    }
   }
 }
 
