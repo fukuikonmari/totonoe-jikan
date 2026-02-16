@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-13.05</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-13.30</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3489,13 +3489,21 @@ function pomoToggle() {
 }
 
 function pomoStart() {
+  // Clear any existing interval first
+  if (pomoInterval) {
+    clearInterval(pomoInterval);
+    pomoInterval = null;
+  }
+
   pomoRunning = true;
-  ensureAudioCtx();
+  try { ensureAudioCtx(); } catch(e) {}
   if (!pomoCurrentStart) pomoCurrentStart = new Date();
   pomoLastTick = Date.now();
   document.getElementById('pomoStartBtn').innerHTML = '⏸';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
   if (pomoMode === 'work') startRain(); else stopRain();
+  pomoUpdateModeButtons();
+  pomoUpdateDisplay();
   savePomoState();
 
   pomoInterval = setInterval(() => {
@@ -3553,6 +3561,19 @@ function pomoPause() {
   pomoRunning = false;
   clearInterval(pomoInterval);
   stopRain();
+  // Log session up to this point
+  if (pomoCurrentStart) {
+    const elapsed = POMO_MODES[pomoMode].duration - pomoTimeLeft;
+    if (elapsed >= 60) {
+      pomoLog.push({
+        startTime: pomoCurrentStart,
+        endTime: new Date(),
+        mode: pomoMode,
+      });
+      ganttSave();
+    }
+    pomoCurrentStart = null;
+  }
   document.getElementById('pomoStartBtn').innerHTML = '▶';
   document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-start';
   ganttRender();
@@ -3597,10 +3618,11 @@ function pomoComplete() {
   }
 
   // Log session
+  const completedAt = new Date();
   if (pomoCurrentStart) {
     pomoLog.push({
       startTime: pomoCurrentStart,
-      endTime: new Date(),
+      endTime: completedAt,
       mode: prevMode,
     });
     pomoCurrentStart = null;
@@ -3625,31 +3647,10 @@ function pomoComplete() {
   // Switch to next mode
   pomoMode = prevMode === 'work' ? 'short' : 'work';
   pomoTimeLeft = POMO_MODES[pomoMode].duration;
-  pomoUpdateModeButtons();
-  pomoUpdateDisplay();
-  ganttRender();
 
-  // Auto-start next timer
-  setTimeout(() => {
-    pomoCurrentStart = new Date();
-    pomoRunning = true;
-    document.getElementById('pomoStartBtn').innerHTML = '⏸';
-    document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
-    if (pomoMode === 'work') startRain(); else stopRain();
-    pomoInterval = setInterval(() => {
-      pomoTimeLeft--;
-      if (pomoTimeLeft <= 0) {
-        pomoTimeLeft = 0;
-        pomoUpdateDisplay();
-        pomoComplete();
-        return;
-      }
-      pomoUpdateDisplay();
-      ganttRender();
-      savePomoState();
-    }, 1000);
-    savePomoState();
-  }, 1000);
+  // Auto-start next timer immediately (use completedAt for continuity)
+  pomoCurrentStart = completedAt;
+  pomoStart();
 }
 
 // ════════════════════════════════════════
