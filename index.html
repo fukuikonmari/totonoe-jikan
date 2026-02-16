@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-12.38</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-13.05</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2168,15 +2168,15 @@ async function parseAndAlarmOnly() {
     activeReminders.push({ timerId: tid5, minBefore: 5, fireTime: eventTime - 5 * 60 * 1000, eventStart: ev.startDate });
   }
 
-  if (eventTime > now) {
-    const tid0 = setTimeout(() => {
-      sendNotification(ev, 0);
-      activeReminders = activeReminders.filter(r => r.minBefore !== 0 || r.eventStart !== ev.startDate);
+  if (eventTime - 1 * 60 * 1000 > now) {
+    const tid1 = setTimeout(() => {
+      sendNotification(ev, 1);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 1 || r.eventStart !== ev.startDate);
       updateReminderChips();
       updateReminderStatusText();
       renderHistory();
-    }, eventTime - now);
-    activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+    }, eventTime - 1 * 60 * 1000 - now);
+    activeReminders.push({ timerId: tid1, minBefore: 1, fireTime: eventTime - 1 * 60 * 1000, eventStart: ev.startDate });
   }
 
   renderHistory();
@@ -2194,7 +2194,7 @@ async function parseAndAlarmOnly() {
   const errEl = document.getElementById('errorMsg');
   errEl.style.display = 'block';
   errEl.style.color = '#2DD4BF';
-  errEl.textContent = `🔔 ${ev.title}（${h}:${m}）の5分前と開始時にアラーム設定済み`;
+  errEl.textContent = `🔔 ${ev.title}（${h}:${m}）の5分前・1分前にアラーム設定済み`;
   setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = ''; }, 3000);
 }
 
@@ -2814,18 +2814,19 @@ async function alarmOnly() {
     }
   }
 
-  // Set start-time alarm
-  if (eventTime > now) {
-    const existing0 = activeReminders.find(r => r.minBefore === 0);
-    if (!existing0) {
-      const tid0 = setTimeout(() => {
-        sendNotification(ev, 0);
-        activeReminders = activeReminders.filter(r => r.minBefore !== 0);
+  // Set 1-min-before alarm
+  const fire1 = eventTime - 1 * 60 * 1000;
+  if (fire1 > now) {
+    const existing1 = activeReminders.find(r => r.minBefore === 1);
+    if (!existing1) {
+      const tid1 = setTimeout(() => {
+        sendNotification(ev, 1);
+        activeReminders = activeReminders.filter(r => r.minBefore !== 1);
         updateReminderChips();
         updateReminderStatusText();
         renderHistory();
-      }, eventTime - now);
-      activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+      }, fire1 - now);
+      activeReminders.push({ timerId: tid1, minBefore: 1, fireTime: fire1, eventStart: ev.startDate });
     }
   }
 
@@ -2835,7 +2836,7 @@ async function alarmOnly() {
   const startTime = safeParseDate(ev.startDate);
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
-  showReminderStatus('success', `🔔 ${ev.title}（${h}:${m}）の5分前と開始時にアラームを設定しました`);
+  showReminderStatus('success', `🔔 ${ev.title}（${h}:${m}）の5分前・1分前にアラームを設定しました`);
 
   // Go back to input after short delay
   setTimeout(() => { goBack(); }, 1500);
