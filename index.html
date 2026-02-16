@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-13.30</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-14.00</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3619,38 +3619,52 @@ function pomoComplete() {
 
   // Log session
   const completedAt = new Date();
-  if (pomoCurrentStart) {
-    pomoLog.push({
-      startTime: pomoCurrentStart,
-      endTime: completedAt,
-      mode: prevMode,
-    });
-    pomoCurrentStart = null;
-    ganttSave();
-  }
+  try {
+    if (pomoCurrentStart) {
+      pomoLog.push({
+        startTime: pomoCurrentStart,
+        endTime: completedAt,
+        mode: prevMode,
+      });
+      pomoCurrentStart = null;
+      ganttSave();
+    }
+  } catch(e) { console.warn('Log error:', e); }
 
   // Notification
-  if ('Notification' in window && Notification.permission === 'granted') {
-    const msg = prevMode === 'work'
-      ? '集中タイム終了！休憩しましょう 🎉'
-      : '休憩終了！集中タイムに戻りましょう 💪';
-    new Notification('🍅 ポモドーロ', {
-      body: msg,
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>',
-      requireInteraction: true,
-    });
-  }
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const msg = prevMode === 'work'
+        ? '集中タイム終了！休憩しましょう 🎉'
+        : '休憩終了！集中タイムに戻りましょう 💪';
+      new Notification('🍅 ポモドーロ', {
+        body: msg,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>',
+      });
+    }
+  } catch(e) { console.warn('Notification error:', e); }
 
-  if (prevMode === 'work') playSound('pomo-work');
-  if (prevMode === 'short') playSound('pomo-break');
+  try {
+    if (prevMode === 'work') playSound('pomo-work');
+    if (prevMode === 'short') playSound('pomo-break');
+  } catch(e) { console.warn('Sound error:', e); }
 
-  // Switch to next mode
-  pomoMode = prevMode === 'work' ? 'short' : 'work';
-  pomoTimeLeft = POMO_MODES[pomoMode].duration;
-
-  // Auto-start next timer immediately (use completedAt for continuity)
+  // Switch to next mode and auto-start via setTimeout to break call chain
+  const nextMode = prevMode === 'work' ? 'short' : 'work';
+  pomoMode = nextMode;
+  pomoTimeLeft = POMO_MODES[nextMode].duration;
   pomoCurrentStart = completedAt;
-  pomoStart();
+  pomoUpdateModeButtons();
+  pomoUpdateDisplay();
+  ganttRender();
+
+  setTimeout(() => {
+    try {
+      pomoStart();
+    } catch(e) {
+      console.warn('Auto-start error:', e);
+    }
+  }, 100);
 }
 
 // ════════════════════════════════════════
