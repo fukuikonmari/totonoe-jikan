@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-15.00</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-15.10</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3038,24 +3038,42 @@ async function setReminder(minBefore) {
   renderHistory();
 }
 
+// Notification debounce - batch overlapping alarms
+let notifQueue = [];
+let notifTimer = null;
+
 function sendNotification(ev, minBefore) {
   const label = minBefore === 0 ? 'まもなく開始' : `あと${minBefore}分`;
   const startTime = safeParseDate(ev.startDate);
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
 
+  notifQueue.push({ title: ev.title, label, time: `${h}:${m}`, location: ev.location });
+
+  // If first in batch, schedule the actual alarm
+  if (!notifTimer) {
+    notifTimer = setTimeout(flushNotifications, 500);
+  }
+}
+
+function flushNotifications() {
+  notifTimer = null;
+  const batch = notifQueue.splice(0);
+  if (batch.length === 0) return;
+
   // 1) Stop rain
   const wasRainActive = rainActive;
   stopRain();
 
-  // 2) Show notification
-  try {
-    new Notification(`📅 ${ev.title}`, {
-      body: `${label}（${h}:${m}〜）${ev.location ? '\n📍 ' + ev.location : ''}`,
-      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
-      requireInteraction: true,
-    });
-  } catch(e) {}
+  // 2) Show notifications
+  batch.forEach(n => {
+    try {
+      new Notification(`📅 ${n.title}`, {
+        body: `${n.label}（${n.time}〜）${n.location ? '\n📍 ' + n.location : ''}`,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
+      });
+    } catch(e) {}
+  });
 
   // 3) Resume rain helper
   let resumed = false;
@@ -3068,7 +3086,7 @@ function sendNotification(ev, minBefore) {
     }
   }
 
-  // 4) Play alarm after 1s using pre-created alarmCtx
+  // 4) Play alarm once after 1s
   setTimeout(() => {
     try {
       if (alarmCtx && alarmCtx.state !== 'closed') {
@@ -3094,7 +3112,6 @@ function sendNotification(ev, minBefore) {
           t += note.dur;
         });
 
-        // Resume rain after alarm
         setTimeout(resumeRainOnce, 1500);
       } else {
         resumeRainOnce();
@@ -3105,7 +3122,6 @@ function sendNotification(ev, minBefore) {
     }
   }, 1000);
 
-  // 5) Absolute safety: resume rain after 4s no matter what
   setTimeout(resumeRainOnce, 4000);
 }
 
