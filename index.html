@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-14.35</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.16-14.50</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1972,19 +1972,19 @@ function startRain() {
       const output = e.outputBuffer.getChannelData(0);
       for (let i = 0; i < output.length; i++) {
         const w = Math.random() * 2 - 1;
-        rainBrown = (rainBrown + 0.001 * w) / 1.001;
+        rainBrown = (rainBrown + 0.0005 * w) / 1.0005;
         let crackle = 0;
-        if (Math.random() > 0.99985) {
+        if (Math.random() > 0.99997) {
           crackle = (Math.random() * 2 - 1) * (0.5 + Math.random() * 0.5);
         }
         let pop = 0;
-        if (Math.random() > 0.9997) {
+        if (Math.random() > 0.99995) {
           const f = 200 + Math.random() * 500;
           pop = Math.sin(2 * Math.PI * f * (i % 150) / rainCtx.sampleRate) * 0.35 * Math.exp(-((i % 150) / 30));
         }
-        const hiss = w * 0.005;
+        const hiss = w * 0.002;
         const flicker = 1 + 0.1 * Math.sin(i * 0.0003 + Math.random() * 0.01);
-        output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.15 + crackle + pop + hiss) * flicker * 1.2));
+        output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.05 + crackle + pop + hiss) * flicker * 1.2));
       }
     };
     rainProcessor.connect(rainGainNode);
