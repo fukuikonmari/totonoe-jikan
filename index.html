@@ -165,9 +165,61 @@
 
   /* ─── Header ─── */
   .header {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     margin-bottom: 14px;
     animation: slideUp 0.7s ease;
+  }
+  .lock-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.4;
+    padding: 4px 8px;
+  }
+  .lock-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #000;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .lock-icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+  .lock-msg {
+    font-size: 14px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .lock-progress {
+    width: 120px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  .lock-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.05s linear;
+    border-radius: 2px;
   }
   .logo {
     display: inline-flex;
@@ -1547,6 +1599,14 @@
       <div class="logo-icon">⌚</div>
       <span class="logo-text">totonoe-jikan</span>
     </div>
+    <button class="lock-btn" onclick="lockScreen()" title="画面ロック">🔒</button>
+  </div>
+
+  <!-- Screen Lock Overlay -->
+  <div class="lock-overlay" id="lockOverlay" style="display:none">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-msg">長押しで解除</div>
+    <div class="lock-progress" id="lockProgress"></div>
   </div>
 
   <!-- ═══ INPUT PHASE ═══ -->
@@ -3734,6 +3794,74 @@ function setTheme(theme) {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+// ════════════════════════════════════════
+//  Screen Lock (pocket mode)
+// ════════════════════════════════════════
+let screenLocked = false;
+let lockHoldTimer = null;
+let lockHoldStart = 0;
+const LOCK_HOLD_DURATION = 1500; // 1.5s to unlock
+
+function lockScreen() {
+  screenLocked = true;
+  const overlay = document.getElementById('lockOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('lockProgress').innerHTML = '<div class="lock-progress-bar" id="lockProgressBar"></div>';
+
+  // Prevent scrolling
+  document.body.style.overflow = 'hidden';
+
+  overlay.addEventListener('touchstart', lockHoldStart_handler, { passive: false });
+  overlay.addEventListener('touchend', lockHoldEnd_handler);
+  overlay.addEventListener('touchmove', lockPreventDefault, { passive: false });
+  overlay.addEventListener('mousedown', lockHoldStart_handler);
+  overlay.addEventListener('mouseup', lockHoldEnd_handler);
+}
+
+function lockPreventDefault(e) { e.preventDefault(); }
+
+function lockHoldStart_handler(e) {
+  e.preventDefault();
+  lockHoldStart = Date.now();
+  const bar = document.getElementById('lockProgressBar');
+  if (bar) bar.style.width = '0%';
+
+  lockHoldTimer = setInterval(() => {
+    const elapsed = Date.now() - lockHoldStart;
+    const pct = Math.min(100, (elapsed / LOCK_HOLD_DURATION) * 100);
+    const bar = document.getElementById('lockProgressBar');
+    if (bar) bar.style.width = pct + '%';
+
+    if (elapsed >= LOCK_HOLD_DURATION) {
+      clearInterval(lockHoldTimer);
+      lockHoldTimer = null;
+      unlockScreen();
+    }
+  }, 30);
+}
+
+function lockHoldEnd_handler() {
+  if (lockHoldTimer) {
+    clearInterval(lockHoldTimer);
+    lockHoldTimer = null;
+  }
+  const bar = document.getElementById('lockProgressBar');
+  if (bar) bar.style.width = '0%';
+}
+
+function unlockScreen() {
+  screenLocked = false;
+  const overlay = document.getElementById('lockOverlay');
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+
+  overlay.removeEventListener('touchstart', lockHoldStart_handler);
+  overlay.removeEventListener('touchend', lockHoldEnd_handler);
+  overlay.removeEventListener('touchmove', lockPreventDefault);
+  overlay.removeEventListener('mousedown', lockHoldStart_handler);
+  overlay.removeEventListener('mouseup', lockHoldEnd_handler);
+}
+
 </script>
 </body>
 </html>
