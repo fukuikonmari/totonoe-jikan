@@ -1,4 +1,5 @@
-const CACHE_NAME = 'totonoe-v2';
+const VERSION = new URL(self.location.href).searchParams.get('v') || 'default';
+const CACHE_NAME = 'totonoe-' + VERSION;
 
 self.addEventListener('install', event => {
   event.waitUntil(
