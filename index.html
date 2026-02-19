@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.17-06.17</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-19.25</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2022,6 +2022,52 @@ function setupAudioResume() {
   document.addEventListener('click', resumeAudio);
   document.addEventListener('touchstart', resumeAudio);
 }
+
+// ── iOS Audio Fix ──
+// iOS suspends AudioContext without user gesture. Keep it alive.
+(function iosAudioFix() {
+  // 1) Resume AudioContext on any tap/click (persistent listener)
+  function resumeAllCtx() {
+    try {
+      if (rainCtx && rainCtx.state === 'suspended') rainCtx.resume();
+      if (alarmCtx && alarmCtx.state === 'suspended') alarmCtx.resume();
+    } catch(e) {}
+  }
+  document.addEventListener('touchstart', resumeAllCtx, { passive: true });
+  document.addEventListener('click', resumeAllCtx);
+
+  // 2) Resume audio when returning from background/lock screen
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      resumeAllCtx();
+      // Restart ambient sound if it should be playing
+      if (pomoRunning && pomoMode === 'work' && !pomoTickMuted && !rainActive) {
+        rainActive = false;
+        startRain();
+      }
+    }
+  });
+
+  // 3) Silent <audio> element keeps iOS audio session alive during screen lock
+  try {
+    const silentAudio = document.createElement('audio');
+    silentAudio.setAttribute('playsinline', '');
+    silentAudio.setAttribute('webkit-playsinline', '');
+    silentAudio.loop = true;
+    // Tiny silent WAV (44 bytes)
+    silentAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    silentAudio.volume = 0.01;
+    document.body.appendChild(silentAudio);
+    // Start on first user gesture
+    function startSilent() {
+      silentAudio.play().catch(() => {});
+      document.removeEventListener('touchstart', startSilent);
+      document.removeEventListener('click', startSilent);
+    }
+    document.addEventListener('touchstart', startSilent, { once: false });
+    document.addEventListener('click', startSilent, { once: false });
+  } catch(e) {}
+})();
 
 const AMBIENT_CYCLE = [
   { type: 'rain',  icon: '🌧', label: '雨音' },
@@ -3962,7 +4008,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.17-06.17').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.19-19.25').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
