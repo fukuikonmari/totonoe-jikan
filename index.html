@@ -1836,7 +1836,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-19.25</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-19.40</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1923,6 +1923,7 @@ function unlockAudio() {
   if (audioUnlocked) return;
   try {
     ensureAudioCtx();
+    ensureAlarmCtx();
     audioUnlocked = true;
   } catch(e) {}
 }
@@ -2054,18 +2055,20 @@ function setupAudioResume() {
     silentAudio.setAttribute('playsinline', '');
     silentAudio.setAttribute('webkit-playsinline', '');
     silentAudio.loop = true;
-    // Tiny silent WAV (44 bytes)
-    silentAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    // Silent WAV (0.1s at 8kHz) keeps iOS audio session alive
+    silentAudio.src = 'data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     silentAudio.volume = 0.01;
     document.body.appendChild(silentAudio);
-    // Start on first user gesture
+    // Start on first user gesture and keep trying
     function startSilent() {
       silentAudio.play().catch(() => {});
-      document.removeEventListener('touchstart', startSilent);
-      document.removeEventListener('click', startSilent);
     }
-    document.addEventListener('touchstart', startSilent, { once: false });
-    document.addEventListener('click', startSilent, { once: false });
+    document.addEventListener('touchstart', startSilent, { passive: true });
+    document.addEventListener('click', startSilent);
+    // Replay when returning from background
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') startSilent();
+    });
   } catch(e) {}
 })();
 
@@ -2123,9 +2126,19 @@ function restoreAmbient() {
 }
 
 // Ensure AudioContext exists (call from user gesture to unlock)
+let rainKeepAlive = null;
+
 function ensureAudioCtx() {
   if (!rainCtx) {
     rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Keep rainCtx alive on iOS with silent oscillator
+    rainKeepAlive = rainCtx.createGain();
+    rainKeepAlive.gain.value = 0;
+    rainKeepAlive.connect(rainCtx.destination);
+    const silent = rainCtx.createOscillator();
+    silent.frequency.value = 0;
+    silent.connect(rainKeepAlive);
+    silent.start();
   }
   if (rainCtx.state === 'suspended') rainCtx.resume();
 }
@@ -3629,7 +3642,7 @@ function pomoStart() {
   }
 
   pomoRunning = true;
-  try { ensureAudioCtx(); } catch(e) {}
+  try { ensureAudioCtx(); ensureAlarmCtx(); } catch(e) {}
   if (!pomoCurrentStart) pomoCurrentStart = new Date();
   pomoLastTick = Date.now();
   document.getElementById('pomoStartBtn').innerHTML = '⏸';
@@ -3776,6 +3789,12 @@ function pomoComplete() {
       });
     }
   } catch(e) { console.warn('Notification error:', e); }
+
+  // Resume audio contexts (kept alive by silent oscillators)
+  try {
+    if (rainCtx && rainCtx.state === 'suspended') rainCtx.resume();
+    if (alarmCtx && alarmCtx.state === 'suspended') alarmCtx.resume();
+  } catch(e) {}
 
   try {
     if (prevMode === 'work') playSound('pomo-work');
@@ -4008,7 +4027,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.19-19.25').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.19-19.40').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
