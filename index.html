@@ -1837,7 +1837,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-21.57</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.20-05.53</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2150,7 +2150,8 @@ function audioDiag() {
   el.innerHTML = '';
   const lines = [];
   function add(msg, ok) {
-    lines.push('<span style="color:' + (ok ? '#4ade80' : '#f87171') + '">' + msg + '</span>');
+    const prefix = ok ? '' : '【エラー】';
+    lines.push('<span style="color:' + (ok ? '#4ade80' : '#f87171') + '">' + prefix + msg + '</span>');
     el.innerHTML = lines.join('<br>');
   }
 
@@ -2164,7 +2165,7 @@ function audioDiag() {
   // Step 2: Init and resume
   try {
     ensureAudioCtx();
-    add('✓ ctx作成 state=' + rainCtx.state, rainCtx.state === 'running');
+    add('✓ ctx作成 state=' + rainCtx.state, rainCtx.state !== 'closed');
   } catch(e) { add('✗ ctx作成失敗: ' + e.message, false); return; }
 
   // Step 3: Play tone
@@ -2190,10 +2191,13 @@ function audioDiag() {
           try {
             playSound('pomo-work');
             add('✓ playSound実行', true);
+            add('――――――――', true);
+            add('✓ 音声テスト正常', true);
           } catch(e) {
             add('✗ playSound失敗: ' + e.message, false);
           }
-          add('音が聞こえない場合→メディア音量を確認', true);
+          const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+          add(isiOS ? '音が聞こえない場合→本体のサイレントスイッチを確認してください' : '音が聞こえない場合→本体の音量を確認してください', true);
         }, 600);
       } catch(e) {
         add('✗ Oscillator失敗: ' + e.message, false);
@@ -4090,7 +4094,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.19-21.57').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.20-05.53').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
