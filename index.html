@@ -1625,7 +1625,8 @@
       <div class="pomo-card">
         <div class="pomo-header">
           <span class="pomo-title">🍅 ポモドーロタイマー</span>
-          <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="ensureAudioCtx();playSound('pomo-work')">🔊 テスト</button>
+          <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()">🔊 テスト</button>
+          <div id="audioDiagResult" style="display:none;font-size:10px;padding:4px 8px;border-radius:6px;margin-top:4px;width:100%;text-align:left;font-family:monospace"></div>
           <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="cycleAmbient()">🌧 雨音</button>
         </div>
         <div class="pomo-main">
@@ -1836,7 +1837,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-19.40</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.19-21.57</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2141,6 +2142,68 @@ function ensureAudioCtx() {
     silent.start();
   }
   if (rainCtx.state === 'suspended') rainCtx.resume();
+}
+
+function audioDiag() {
+  const el = document.getElementById('audioDiagResult');
+  el.style.display = 'block';
+  el.innerHTML = '';
+  const lines = [];
+  function add(msg, ok) {
+    lines.push('<span style="color:' + (ok ? '#4ade80' : '#f87171') + '">' + msg + '</span>');
+    el.innerHTML = lines.join('<br>');
+  }
+
+  // Step 1: Create AudioContext
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { add('✗ AudioContext未対応', false); return; }
+    add('✓ AudioContext API あり', true);
+  } catch(e) { add('✗ API確認失敗: ' + e.message, false); return; }
+
+  // Step 2: Init and resume
+  try {
+    ensureAudioCtx();
+    add('✓ ctx作成 state=' + rainCtx.state, rainCtx.state === 'running');
+  } catch(e) { add('✗ ctx作成失敗: ' + e.message, false); return; }
+
+  // Step 3: Play tone
+  try {
+    rainCtx.resume().then(function() {
+      add('✓ resume後 state=' + rainCtx.state, rainCtx.state === 'running');
+      try {
+        const osc = rainCtx.createOscillator();
+        const gain = rainCtx.createGain();
+        gain.gain.value = 1.5;
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(rainCtx.destination);
+        osc.start();
+        osc.stop(rainCtx.currentTime + 0.5);
+        add('✓ 880Hz再生開始', true);
+        add('  sampleRate=' + rainCtx.sampleRate, true);
+        add('  currentTime=' + rainCtx.currentTime.toFixed(2), true);
+
+        // Step 4: playSound test
+        setTimeout(function() {
+          try {
+            playSound('pomo-work');
+            add('✓ playSound実行', true);
+          } catch(e) {
+            add('✗ playSound失敗: ' + e.message, false);
+          }
+          add('音が聞こえない場合→メディア音量を確認', true);
+        }, 600);
+      } catch(e) {
+        add('✗ Oscillator失敗: ' + e.message, false);
+      }
+    }).catch(function(e) {
+      add('✗ resume失敗: ' + e.message, false);
+    });
+  } catch(e) {
+    add('✗ 再生失敗: ' + e.message, false);
+  }
 }
 
 function playSound(type) {
@@ -4027,7 +4090,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.19-19.40').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.19-21.57').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
