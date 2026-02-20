@@ -1837,7 +1837,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.20-06.32</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.20-21.16</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2146,6 +2146,10 @@ function ensureAudioCtx() {
 
 function audioDiag() {
   const el = document.getElementById('audioDiagResult');
+  if (el.style.display === 'block') {
+    el.style.display = 'none';
+    return;
+  }
   el.style.display = 'block';
   el.innerHTML = '';
   const lines = [];
@@ -4137,7 +4141,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.20-06.32').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.20-21.16').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
