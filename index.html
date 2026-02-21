@@ -114,6 +114,23 @@
     --tick-color: #FDBA74;
   }
 
+  :root[data-theme="konmari-beige"] {
+    --bg: #F5F0E8;
+    --surface: #FFFDF8;
+    --surface2: #EDE6D8;
+    --border: #D4C5A9;
+    --text: #3D3428;
+    --text-dim: #9A8B73;
+    --accent: #A89078;
+    --accent-glow: rgba(168,144,120,0.2);
+    --accent2: #B9A18A;
+    --success: #A8C5A0;
+    --gcal-blue: #4285F4;
+    --ring-work: #A89078;
+    --ring-break: #A8C5A0;
+    --tick-color: #D4C5A9;
+  }
+
   html, body {
     background: var(--bg);
     color: var(--text);
@@ -1814,8 +1831,8 @@
   <div class="theme-picker">
     
     <div class="theme-picker-btns">
-      <button class="theme-btn active" data-theme="" onclick="setTheme('')" title="ダーク">
-        <span class="theme-swatch" style="background:#0A0E1A;border-color:#3B82F6"></span>
+      <button class="theme-btn active" data-theme="konmari-beige" onclick="setTheme('konmari-beige')" title="ときめき">
+        <span class="theme-swatch" style="background:#EDE6D8;border-color:#A89078"></span>
       </button>
       <button class="theme-btn" data-theme="pastel-pink" onclick="setTheme('pastel-pink')" title="ピンク">
         <span class="theme-swatch" style="background:#FFF0F3;border-color:#F472B6"></span>
@@ -1832,12 +1849,15 @@
       <button class="theme-btn" data-theme="pastel-peach" onclick="setTheme('pastel-peach')" title="ピーチ">
         <span class="theme-swatch" style="background:#FFF7ED;border-color:#F97316"></span>
       </button>
+      <button class="theme-btn" data-theme="" onclick="setTheme('')" title="ダーク">
+        <span class="theme-swatch" style="background:#0A0E1A;border-color:#3B82F6"></span>
+      </button>
     </div>
   </div>
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.20-21.16</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.21-10.12</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -4133,15 +4153,15 @@ function setTheme(theme) {
 (function loadTheme() {
   try {
     const saved = localStorage.getItem('aical_theme');
-    if (saved) setTheme(saved);
-  } catch(e) {}
+    setTheme(saved !== null ? saved : 'konmari-beige');
+  } catch(e) { setTheme('konmari-beige'); }
 })();
 
 // ════════════════════════════════════════
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.20-21.16').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.21-10.12').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
