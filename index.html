@@ -1857,7 +1857,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.21-13.16</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.21-13.25</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2222,6 +2222,7 @@ function audioDiag() {
           }
           const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
           add(isiOS ? '音が聞こえない場合→本体のサイレントスイッチを確認してください' : '音が聞こえない場合→本体の音量を確認してください', true);
+          setTimeout(function() { el.style.display = 'none'; }, 5000);
         }, 600);
       } catch(e) {
         add('✗ Oscillator失敗: ' + e.message, false);
@@ -4161,7 +4162,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.21-13.16').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.21-13.25').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
