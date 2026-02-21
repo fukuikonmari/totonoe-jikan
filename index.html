@@ -1857,7 +1857,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.21-14.49</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.22-08.29</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2004,7 +2004,7 @@ function startRain() {
           const f = 200 + Math.random() * 500;
           pop = Math.sin(2 * Math.PI * f * (i % 150) / rainCtx.sampleRate) * 0.35 * Math.exp(-((i % 150) / 30));
         }
-        const hiss = w * 0.002;
+        const hiss = w * 0.0005;
         const flicker = 1 + 0.1 * Math.sin(i * 0.0003 + Math.random() * 0.01);
         output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.05 + crackle + pop + hiss) * flicker * 1.2));
       }
@@ -4162,7 +4162,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.21-14.49').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.22-08.29').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
