@@ -1857,7 +1857,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.25-22.14</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.25-22.40</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2240,11 +2240,11 @@ function playCountdownTick() {
     if (!rainCtx) return;
     rainCtx.resume();
     const g = rainCtx.createGain();
-    g.gain.setValueAtTime(1.2, rainCtx.currentTime);
+    g.gain.setValueAtTime(0.1, rainCtx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.01, rainCtx.currentTime + 0.06);
     g.connect(rainCtx.destination);
     const o = rainCtx.createOscillator();
-    o.type = 'triangle';
+    o.type = 'sawtooth';
     o.frequency.value = 523;
     o.connect(g);
     o.start(rainCtx.currentTime);
@@ -2257,28 +2257,35 @@ function playSound(type) {
     if (!rainCtx) return;
     rainCtx.resume();
 
-    const sounds = {
-      'reminder': [{ freq: 880, dur: 0.2 }, { freq: 1100, dur: 0.2 }, { freq: 880, dur: 0.2 }, { freq: 1100, dur: 0.3 }],
-      'pomo-work': [{ freq: 1047, dur: 0.6 }],
-      'pomo-break': [{ freq: 1047, dur: 0.6 }],
-    };
-    const notes = sounds[type];
-    if (!notes) return;
+    if (type === 'reminder') {
+      const gain = rainCtx.createGain();
+      gain.gain.value = 2.5;
+      gain.connect(rainCtx.destination);
+      let t = rainCtx.currentTime;
+      [{freq:880,dur:0.2},{freq:1100,dur:0.2},{freq:880,dur:0.2},{freq:1100,dur:0.3}].forEach(note => {
+        const osc = rainCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
+        osc.connect(gain);
+        osc.start(t);
+        osc.stop(t + note.dur * 0.9);
+        t += note.dur;
+      });
+      return;
+    }
 
+    // pomo-work / pomo-break: sawtooth + fade
     const gain = rainCtx.createGain();
-    gain.gain.value = type === 'reminder' ? 2.5 : 1.5;
+    const t = rainCtx.currentTime;
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 1.0);
     gain.connect(rainCtx.destination);
-
-    let t = rainCtx.currentTime;
-    notes.forEach(note => {
-      const osc = rainCtx.createOscillator();
-      osc.type = type === 'reminder' ? 'sine' : 'triangle';
-      osc.frequency.value = note.freq;
-      osc.connect(gain);
-      osc.start(t);
-      osc.stop(t + note.dur * 0.9);
-      t += note.dur;
-    });
+    const osc = rainCtx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 1047;
+    osc.connect(gain);
+    osc.start(t);
+    osc.stop(t + 1.0);
   } catch(e) {
     console.warn('Audio error:', e);
   }
@@ -4180,7 +4187,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.25-22.14').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.25-22.40').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
