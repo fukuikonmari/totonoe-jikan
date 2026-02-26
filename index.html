@@ -1857,7 +1857,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.25-22.40</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.27-05.59</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2235,20 +2235,42 @@ function audioDiag() {
   }
 }
 
-function playCountdownTick() {
+let pomoCountdownScheduled = false;
+
+function scheduleCountdown(secsLeft) {
   try {
     if (!rainCtx) return;
     rainCtx.resume();
-    const g = rainCtx.createGain();
-    g.gain.setValueAtTime(0.1, rainCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.01, rainCtx.currentTime + 0.06);
-    g.connect(rainCtx.destination);
-    const o = rainCtx.createOscillator();
-    o.type = 'sawtooth';
-    o.frequency.value = 523;
-    o.connect(g);
-    o.start(rainCtx.currentTime);
-    o.stop(rainCtx.currentTime + 0.06);
+    pomoCountdownScheduled = true;
+    const t0 = rainCtx.currentTime;
+
+    // Schedule ticks at precise 1-second intervals
+    for (let i = 0; i < secsLeft; i++) {
+      const t = t0 + i;
+      const g = rainCtx.createGain();
+      g.gain.setValueAtTime(0.1, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      g.connect(rainCtx.destination);
+      const o = rainCtx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = 523;
+      o.connect(g);
+      o.start(t);
+      o.stop(t + 0.06);
+    }
+
+    // Schedule chime at exact end
+    const tChime = t0 + secsLeft;
+    const gC = rainCtx.createGain();
+    gC.gain.setValueAtTime(0.1, tChime);
+    gC.gain.exponentialRampToValueAtTime(0.001, tChime + 1.0);
+    gC.connect(rainCtx.destination);
+    const oC = rainCtx.createOscillator();
+    oC.type = 'sawtooth';
+    oC.frequency.value = 1047;
+    oC.connect(gC);
+    oC.start(tChime);
+    oC.stop(tChime + 1.0);
   } catch(e) {}
 }
 
@@ -3856,7 +3878,7 @@ function pomoStart() {
       pomoComplete();
       return;
     }
-    if (pomoTimeLeft <= 3) playCountdownTick();
+    if (pomoTimeLeft <= 3 && !pomoCountdownScheduled) scheduleCountdown(pomoTimeLeft);
     pomoUpdateDisplay();
     ganttRender();
     savePomoState();
@@ -3889,6 +3911,7 @@ function pomoPause() {
 
 function pomoReset() {
   pomoRunning = false;
+  pomoCountdownScheduled = false;
   clearInterval(pomoInterval);
   stopRain();
   // Log partial session
@@ -3917,6 +3940,7 @@ function pomoComplete() {
   clearInterval(pomoInterval);
   pomoInterval = null;
   pomoRunning = false;
+  pomoCountdownScheduled = false;
   stopRain();
 
   const prevMode = pomoMode;
@@ -3957,8 +3981,7 @@ function pomoComplete() {
   } catch(e) {}
 
   try {
-    if (prevMode === 'work') playSound('pomo-work');
-    if (prevMode === 'short') playSound('pomo-break');
+    // Countdown chime already scheduled by scheduleCountdown
   } catch(e) { console.warn('Sound error:', e); }
 
   // Switch to next mode and auto-start via setTimeout to break call chain
@@ -4187,7 +4210,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.25-22.40').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.27-05.59').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
