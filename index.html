@@ -974,6 +974,11 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px var(--accent-glow);
   }
+  .memo-pin-btn {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
   .memo-list {
     margin-top: 10px;
   }
@@ -1718,6 +1723,7 @@
         <div class="memo-input-row">
           <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
           <button class="memo-add-btn" onclick="addMemo()">追加</button>
+          <button class="memo-add-btn memo-pin-btn" onclick="addWaku()">📌</button>
         </div>
         <div class="memo-list" id="memoList"></div>
       </div>
@@ -1857,7 +1863,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.27-05.59</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.28-21.58</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3469,6 +3475,27 @@ function addMemo() {
   renderMemos();
 }
 
+function showToast(msg) {
+  const t = document.getElementById('toastMsg');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 1500);
+}
+
+function addWaku() {
+  const input = document.getElementById('memoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const list = getMemos();
+  const pinnedCount = list.filter(m => m.pinned).length;
+  list.unshift({ id: Date.now(), text, createdAt: new Date().toISOString(), pinned: true, pinOrder: pinnedCount + 1 });
+  if (list.length > 100) list.length = 100;
+  saveMemos(list);
+  input.value = '';
+  renderMemos();
+  showToast('📌 ワクワクリストに追加しました');
+}
+
 function deleteMemo(id) {
   let list = getMemos();
   list = list.filter(m => m.id !== id);
@@ -3553,11 +3580,11 @@ function renderMemos() {
     const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     const pinCls = m.pinned ? ' pinned' : '';
     return `<div class="memo-item">
+      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
       <div style="flex:1">
         <div class="memo-item-text">${escHTML(m.text)}</div>
       </div>
       <div class="memo-item-time">${time}</div>
-      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
       <button class="memo-item-del" onclick="deleteMemo(${m.id})">✕</button>
     </div>`;
   }).join('');
@@ -4210,7 +4237,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.27-05.59').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.2.28-21.58').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
@@ -4281,5 +4308,6 @@ function unlockScreen() {
 }
 
 </script>
+  <div id="toastMsg" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;display:none;z-index:9999"></div>
 </body>
 </html>
