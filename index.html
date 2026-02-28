@@ -1863,7 +1863,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.2.28-21.58</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.1-07.34</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3509,10 +3509,12 @@ function togglePin(id) {
   if (!memo) return;
   memo.pinned = !memo.pinned;
   if (memo.pinned) {
-    const pinned = list.filter(m => m.pinned);
-    memo.pinOrder = pinned.length;
+    const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+    pinned.forEach((m, i) => { m.pinOrder = i; });
   } else {
     memo.pinOrder = 0;
+    const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+    pinned.forEach((m, i) => { m.pinOrder = i; });
   }
   saveMemos(list);
   renderMemos();
@@ -4237,7 +4239,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.2.28-21.58').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.3.1-07.34').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
