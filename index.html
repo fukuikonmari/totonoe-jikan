@@ -1132,24 +1132,6 @@
     border-color: var(--accent);
     color: var(--accent);
   }
-  .memo-clear-btn {
-    background: none;
-    border: 1px solid transparent;
-    color: var(--text-dim);
-    font-size: 11px;
-    font-family: 'Noto Sans JP', sans-serif;
-    cursor: pointer;
-    padding: 2px 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    position: relative;
-    left: 9px;
-  }
-  .memo-clear-btn:hover {
-    background: rgba(248,113,113,0.1);
-    border-color: #f87171;
-    color: #f87171;
-  }
   .history-header {
     display: flex;
     align-items: center;
@@ -1253,21 +1235,6 @@
     color: var(--text-dim);
     font-size: 13px;
     opacity: 0.6;
-  }
-  .history-clear-btn {
-    font-size: 12px;
-    color: #f87171;
-    background: none;
-    border: 1px solid rgba(248,113,113,0.3);
-    border-radius: 100px;
-    padding: 4px 12px;
-    cursor: pointer;
-    font-family: 'Noto Sans JP', sans-serif;
-    transition: all 0.2s;
-  }
-  .history-clear-btn:hover {
-    background: rgba(248,113,113,0.1);
-    border-color: #f87171;
   }
 
   /* Pomodoro Timer */
@@ -1718,7 +1685,6 @@
       <div class="memo-card">
         <div class="memo-header">
           <span class="memo-title">📝 ひとことメモ</span>
-          <button class="memo-clear-btn" id="memoClearBtn" style="display:none" onclick="clearAllMemos()">すべて削除</button>
         </div>
         <div class="memo-input-row">
           <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
@@ -1754,7 +1720,6 @@
         <span class="history-title">📋 予定</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="history-count" id="historyCount"></span>
-          <button class="history-clear-btn" onclick="clearAllHistory()">すべて削除</button>
         </div>
       </div>
       <div class="history-list" id="historyList"></div>
@@ -1863,7 +1828,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.1-07.48</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.1-08.00</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2932,13 +2897,6 @@ function deleteFromHistory(id) {
   ganttRender();
 }
 
-function clearAllHistory() {
-  if (!confirm('予定をすべて削除しますか？')) return;
-  saveHistory([]);
-  renderHistory();
-  ganttRender();
-}
-
 function reopenFromHistory(id) {
   const list = getHistory();
   const entry = list.find(e => e.id === id);
@@ -3543,17 +3501,9 @@ function editPinnedMemo(id, el) {
   renderMemos();
 }
 
-function clearAllMemos() {
-  if (!confirm('メモをすべて削除しますか？')) return;
-  saveMemos([]);
-  renderMemos();
-}
-
 function renderMemos() {
   const list = getMemos();
   const el = document.getElementById('memoList');
-  const clearBtn = document.getElementById('memoClearBtn');
-  clearBtn.style.display = list.length > 1 ? 'block' : 'none';
 
   // Render pinned area
   const pinnedMemos = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
@@ -4241,7 +4191,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.3.1-07.48').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.3.1-08.00').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
