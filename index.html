@@ -1250,9 +1250,10 @@
   }
   .pomo-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 6px;
     margin-bottom: 12px;
   }
   .pomo-title {
@@ -1614,7 +1615,7 @@
       <div class="pomo-card">
         <div class="pomo-header">
           <span class="pomo-title">🍅 ポモドーロタイマー</span>
-          <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()">🔊 音テスト</button>
+          <button class="notif-help-btn" style="display:none;margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()">🔊 音テスト</button>
           <div id="audioDiagResult" style="display:none;font-size:10px;padding:4px 8px;border-radius:6px;margin-top:4px;width:100%;text-align:left;font-family:monospace"></div>
           <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="cycleAmbient()">🌧 雨音</button>
         </div>
@@ -1828,7 +1829,7 @@
 
   <div class="footer">totonoe-jikan — ブラウザで完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.1-08.00</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.1-20.37</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -4191,7 +4192,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.3.1-08.00').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.3.1-20.37').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
