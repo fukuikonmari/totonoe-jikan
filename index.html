@@ -4176,7 +4176,7 @@ setInterval(() => { checkDayChange(); if (!pomoRunning) ganttRender(); }, 60000)
 function isKonmari() {
   return document.documentElement.getAttribute('data-theme') === 'konmari-beige';
 }
-function workLabel() { return isKonmari() ? 'もくもく' : '集中'; }
+function workLabel() { return '集中'; }
 
 function setTheme(theme) {
   if (theme) {
