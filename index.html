@@ -1829,7 +1829,7 @@
 
   <div class="footer">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.9-06.12</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.10-19.59</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -3951,8 +3951,8 @@ function pomoComplete() {
   try {
     if ('Notification' in window && Notification.permission === 'granted') {
       const msg = prevMode === 'work'
-        ? '集中タイム終了！休憩しましょう 🎉'
-        : '休憩終了！集中タイムに戻りましょう 💪';
+        ? workLabel() + 'タイム終了！休憩しましょう 🎉'
+        : '休憩終了！' + workLabel() + 'タイムに戻りましょう 💪';
       new Notification('🍅 ポモドーロ', {
         body: msg,
         icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>',
@@ -4087,7 +4087,7 @@ function ganttUpdateSummary(logs) {
   }
 
   document.getElementById('pomoGanttSummary').innerHTML = `
-    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-work)"></div> 集中 ${Math.round(workMin)}分</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-work)"></div> ${workLabel()} ${Math.round(workMin)}分</div>
     <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-break)"></div> 休憩 ${Math.round(breakMin)}分</div>
     <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:rgba(255,179,71,0.5);border:1px solid rgba(255,179,71,0.7)"></div> 予定</div>
   `;
@@ -4173,6 +4173,11 @@ setInterval(() => { checkDayChange(); if (!pomoRunning) ganttRender(); }, 60000)
 // ════════════════════════════════════════
 //  Theme
 // ════════════════════════════════════════
+function isKonmari() {
+  return document.documentElement.getAttribute('data-theme') === 'konmari-beige';
+}
+function workLabel() { return isKonmari() ? 'もくもく' : '集中'; }
+
 function setTheme(theme) {
   if (theme) {
     document.documentElement.setAttribute('data-theme', theme);
@@ -4183,6 +4188,16 @@ function setTheme(theme) {
     btn.classList.toggle('active', btn.dataset.theme === theme);
   });
   try { localStorage.setItem('aical_theme', theme); } catch(e) {}
+  updateThemeLabels();
+}
+
+function updateThemeLabels() {
+  const wl = workLabel();
+  const memoTitle = isKonmari() ? '📝 ときめきメモ' : '📝 ひとことメモ';
+  const workBtn = document.getElementById('pomoModeWork');
+  if (workBtn) workBtn.textContent = wl + ' 25分';
+  const memoEl = document.querySelector('.memo-title');
+  if (memoEl) memoEl.textContent = memoTitle;
 }
 
 (function loadTheme() {
@@ -4196,7 +4211,7 @@ function setTheme(theme) {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.3.9-06.12').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.3.10-19.59').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
