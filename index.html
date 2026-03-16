@@ -1659,7 +1659,7 @@
               </g>
             </svg>
             <div class="pomo-time-inner">
-              <div class="pomo-spark-joy"><span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie?</span></div>
+              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie?</span></div>
               <div class="pomo-time-text" id="pomoTimeText">25:00</div>
               <div class="pomo-mode-label" id="pomoModeLabel">集中</div>
             </div>
@@ -1829,7 +1829,7 @@
 
   <div class="footer">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.10-19.59</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.17-05.23</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -4198,6 +4198,14 @@ function updateThemeLabels() {
   if (workBtn) workBtn.textContent = wl + ' 25分';
   const memoEl = document.querySelector('.memo-title');
   if (memoEl) memoEl.textContent = memoTitle;
+  const sparkEl = document.getElementById('pomoSparkJoy');
+  if (sparkEl) {
+    if (isKonmari()) {
+      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
+    } else {
+      sparkEl.innerHTML = '<span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie?</span>';
+    }
+  }
 }
 
 (function loadTheme() {
@@ -4211,7 +4219,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.3.10-19.59').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.3.17-05.23').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
