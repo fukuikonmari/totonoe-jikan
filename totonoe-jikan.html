@@ -1,0 +1,4295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ととのえ">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180x180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-96x96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E1A">
+<title>ととのえ時間−今日が成長＆ときめきの１日になりますように</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  input, textarea, button, select { -webkit-appearance: none; appearance: none; }
+
+  :root {
+    --bg: #0A0E1A;
+    --surface: #111827;
+    --surface2: #1E2940;
+    --border: #2A3A5C;
+    --text: #E8EDF5;
+    --text-dim: #7B8BA8;
+    --accent: #3B82F6;
+    --accent-glow: rgba(59,130,246,0.25);
+    --accent2: #60A5FA;
+    --success: #4ADE80;
+    --gcal-blue: #4285F4;
+    --ring-work: #3B82F6;
+    --ring-break: #4ADE80;
+    --tick-color: #2A3A5C;
+  }
+  :root[data-theme="pastel-pink"] {
+    --bg: #FFF0F3;
+    --surface: #FFFFFF;
+    --surface2: #FFE0E6;
+    --border: #FFBAC8;
+    --text: #4A2030;
+    --text-dim: #B06080;
+    --accent: #F472B6;
+    --accent-glow: rgba(244,114,182,0.2);
+    --accent2: #FB7FB8;
+    --success: #86EFAC;
+    --gcal-blue: #4285F4;
+    --ring-work: #F472B6;
+    --ring-break: #86EFAC;
+    --tick-color: #FFBAC8;
+  }
+  :root[data-theme="pastel-mint"] {
+    --bg: #ECFDF5;
+    --surface: #FFFFFF;
+    --surface2: #D1FAE5;
+    --border: #A7F3D0;
+    --text: #1A3C34;
+    --text-dim: #5E9A88;
+    --accent: #34D399;
+    --accent-glow: rgba(52,211,153,0.2);
+    --accent2: #6EE7B7;
+    --success: #34D399;
+    --gcal-blue: #4285F4;
+    --ring-work: #34D399;
+    --ring-break: #93C5FD;
+    --tick-color: #A7F3D0;
+  }
+  :root[data-theme="pastel-lavender"] {
+    --bg: #F3F0FF;
+    --surface: #FFFFFF;
+    --surface2: #E4DEFF;
+    --border: #C4B5FD;
+    --text: #2E1A5E;
+    --text-dim: #7C6AAE;
+    --accent: #8B5CF6;
+    --accent-glow: rgba(139,92,246,0.2);
+    --accent2: #A78BFA;
+    --success: #86EFAC;
+    --gcal-blue: #4285F4;
+    --ring-work: #8B5CF6;
+    --ring-break: #86EFAC;
+    --tick-color: #C4B5FD;
+  }
+  :root[data-theme="pastel-sky"] {
+    --bg: #EFF6FF;
+    --surface: #FFFFFF;
+    --surface2: #DBEAFE;
+    --border: #93C5FD;
+    --text: #1E2A4A;
+    --text-dim: #6082B0;
+    --accent: #3B82F6;
+    --accent-glow: rgba(59,130,246,0.15);
+    --accent2: #60A5FA;
+    --success: #86EFAC;
+    --gcal-blue: #4285F4;
+    --ring-work: #3B82F6;
+    --ring-break: #86EFAC;
+    --tick-color: #93C5FD;
+  }
+  :root[data-theme="pastel-peach"] {
+    --bg: #FFF7ED;
+    --surface: #FFFFFF;
+    --surface2: #FFEDD5;
+    --border: #FDBA74;
+    --text: #432818;
+    --text-dim: #A67050;
+    --accent: #F97316;
+    --accent-glow: rgba(249,115,22,0.2);
+    --accent2: #FB923C;
+    --success: #86EFAC;
+    --gcal-blue: #4285F4;
+    --ring-work: #F97316;
+    --ring-break: #86EFAC;
+    --tick-color: #FDBA74;
+  }
+
+  :root[data-theme="konmari-beige"] {
+    --bg: #F5F0E8;
+    --surface: #FFFDF8;
+    --surface2: #EDE6D8;
+    --border: #D4C5A9;
+    --text: #3D3428;
+    --text-dim: #9A8B73;
+    --accent: #A89078;
+    --accent-glow: rgba(168,144,120,0.2);
+    --accent2: #B9A18A;
+    --success: #A8C5A0;
+    --gcal-blue: #4285F4;
+    --ring-work: #A89078;
+    --ring-break: #A8C5A0;
+    --tick-color: #D4C5A9;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0; }
+    100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+  }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 28px 20px 40px;
+    padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+    position: relative;
+  }
+
+  /* Floating particles */
+  .particle {
+    position: fixed;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(59,130,246,0.12);
+    pointer-events: none;
+    animation: floatUp 9s ease-in-out infinite;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 14px;
+    animation: slideUp 0.7s ease;
+  }
+  .lock-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.4;
+    padding: 4px 8px;
+  }
+  .lock-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #000;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .lock-icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+  .lock-msg {
+    font-size: 14px;
+    color: rgba(255,255,255,0.25);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .lock-progress {
+    width: 120px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  .lock-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.05s linear;
+    border-radius: 2px;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 0;
+  }
+  .logo-icon {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    box-shadow: 0 2px 8px var(--accent-glow);
+  }
+  .logo-text {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--text), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.7;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 300;
+    letter-spacing: 1.5px;
+  }
+
+  /* ─── Input Phase ─── */
+  .phase { display: none; }
+  .phase.active { display: block; }
+
+  .input-area { animation: slideUp 0.7s 0.2s ease both; }
+
+  .textarea-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+  .input-clear-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 2;
+    padding: 0;
+    line-height: 1;
+  }
+  .input-clear-btn:hover { opacity: 1; color: #f87171; }
+  .textarea-wrap textarea {
+    width: 100%;
+    min-height: 56px;
+    padding: 16px 36px 16px 20px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    color: var(--text);
+    font-size: 17px;
+    font-family: 'Noto Sans JP', sans-serif;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .textarea-wrap textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .placeholder-overlay {
+    position: absolute;
+    top: 16px; left: 20px;
+    font-size: 17px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text-dim);
+    opacity: 0.4;
+    pointer-events: none;
+    line-height: 1.7;
+  }
+  .placeholder-cursor {
+    display: inline-block;
+    width: 2px; height: 1.1em;
+    background: var(--accent);
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Example chips */
+  .examples {
+    margin-top: 28px;
+    animation: slideUp 0.7s 0.25s ease both;
+  }
+  .examples-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .example-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .example-chip {
+    padding: 8px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .example-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(59,130,246,0.08);
+  }
+
+  /* ─── Result Phase ─── */
+  .result-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: slideUp 0.6s ease;
+  }
+  .result-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .result-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(74,222,128,0.15), rgba(74,222,128,0.05));
+    border: 1px solid rgba(74,222,128,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .result-title {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .result-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(74,222,128,0.12);
+    color: var(--success);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .result-body { padding: 24px 28px; }
+
+  .detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+  }
+  .detail-row + .detail-row {
+    border-top: 1px solid rgba(42,42,50,0.6);
+  }
+  .detail-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .detail-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 3px;
+    font-weight: 500;
+  }
+  .detail-value {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Edit section */
+  .edit-section {
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+  .edit-section.open { display: block; animation: fadeIn 0.3s; }
+
+  .edit-field { margin-bottom: 14px; }
+  .edit-field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  .edit-field input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .edit-field input:focus { border-color: var(--accent); }
+
+  .edit-toggle {
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .edit-toggle:hover { color: var(--accent); }
+
+  /* Action buttons */
+  .result-actions {
+    padding: 20px 28px 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .btn-alarm-only {
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid #F59E0B;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-alarm-only:hover {
+    background: rgba(245, 158, 11, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(245,158,11,0.25);
+  }
+  .btn-alarm-only:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-gcal {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2DD4BF, #14B8A6);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-gcal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(45,212,191,0.35);
+  }
+  .btn-ics {
+    padding: 14px 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-ics:hover {
+    border-color: var(--text-dim);
+    color: var(--text);
+    transform: translateY(-2px);
+  }
+  .btn-back {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+  .error-msg {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 12px;
+    color: #f87171;
+    font-size: 14px;
+    animation: fadeIn 0.3s;
+  }
+
+  /* Theme picker */
+  .theme-picker {
+    text-align: center;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+  .theme-picker-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .theme-picker-btns {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .theme-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    padding: 3px;
+    transition: all 0.2s;
+  }
+  .theme-btn:hover {
+    transform: scale(1.15);
+  }
+  .theme-btn.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .theme-swatch {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 12px;
+    color: var(--text-dim);
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 24px 16px 40px; }
+    .logo-text { font-size: 18px; }
+    .result-header { padding: 18px 20px 16px; }
+    .result-body { padding: 18px 20px; }
+    .result-actions { padding: 16px 20px 22px; flex-direction: column; }
+    .btn-gcal, .btn-ics, .btn-alarm-only { width: 100%; justify-content: center; }
+    .edit-section { padding: 16px 20px; }
+    .reminder-section { padding: 14px 20px; }
+    .history-item { padding: 12px 14px; }
+    .pomo-card { padding: 16px; }
+    .pomo-main { gap: 10px; }
+    .pomo-modes-top .pomo-mode-btn { font-size: 11px; padding: 6px 12px; }
+    .pomo-display { width: 150px; height: 150px; }
+    .pomo-ring { width: 150px; height: 150px; }
+    .pomo-time-text { font-size: 22px; }
+    .pomo-btn { font-size: 11px; padding: 7px 10px; }
+    .memo-card { padding: 12px; }
+    .memo-input-row { gap: 6px; }
+    .memo-input { font-size: 16px; padding: 8px 10px; }
+    .memo-add-btn { font-size: 12px; padding: 8px 10px; }
+  }
+
+  /* Reminder */
+  .reminder-section {
+    padding: 18px 28px;
+    border-top: 1px solid var(--border);
+  }
+  .reminder-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .reminder-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .reminder-chip {
+    padding: 7px 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .reminder-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .reminder-chip.active {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.15);
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .reminder-status {
+    font-size: 13px;
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: fadeIn 0.3s;
+  }
+  .reminder-status.warning {
+    color: #FBBF24;
+  }
+  .reminder-status.error {
+    color: #f87171;
+  }
+  .notif-help-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.25);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .notif-help-btn:hover {
+    background: rgba(248,113,113,0.18);
+    border-color: #f87171;
+  }
+  .notif-help-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.25s;
+    padding: 20px;
+  }
+  .notif-help-content {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    max-width: 460px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.35s ease;
+  }
+  .notif-help-content h3 {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif-help-content .browser-section {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .notif-help-content .browser-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent2);
+  }
+  .notif-help-content .browser-steps {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+  .notif-help-content .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .notif-help-close {
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .notif-help-close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .reminder-pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulseRing 2s ease-in-out infinite;
+  }
+
+  /* Time adjuster */
+  .time-adjuster {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .time-adj-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    padding: 0;
+    line-height: 1;
+  }
+  .time-adj-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(59,130,246,0.1);
+  }
+  .time-adj-btn:active {
+    transform: scale(0.92);
+  }
+  .time-adj-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+  }
+
+  /* History list */
+  .history-section {
+    margin-top: 24px;
+    animation: slideUp 0.7s 0.35s ease both;
+  }
+
+  /* Memo */
+  .memo-section {
+    margin-top: 20px;
+    margin-bottom: 28px;
+    animation: slideUp 0.7s 0.1s ease both;
+    overflow: hidden;
+  }
+  .memo-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .memo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .memo-title {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .memo-input-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .memo-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 16px;
+    font-family: 'Noto Sans JP', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .memo-input:focus {
+    border-color: var(--accent);
+  }
+  .memo-input::placeholder {
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+  .memo-add-btn {
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .memo-add-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+  .memo-pin-btn {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .memo-list {
+    margin-top: 10px;
+  }
+  .memo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeIn 0.3s ease;
+  }
+  .memo-item:last-child { border-bottom: none; }
+  .memo-item-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .memo-item-time {
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .memo-item-del {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .memo-item-del:hover { opacity: 1; color: #f87171; }
+  .memo-item-pin {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    opacity: 0.4;
+    transition: all 0.2s;
+  }
+  .memo-item-pin:hover { opacity: 1; }
+  .memo-item-pin.pinned { opacity: 1; color: var(--accent); }
+
+  /* Pinned section */
+  .pinned-section {
+    margin-top: -4px;
+    margin-bottom: 10px;
+    animation: slideUp 0.5s ease both;
+  }
+  .pinned-card {
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .pinned-header {
+    margin-bottom: 6px;
+  }
+  .pinned-title {
+    font-size: 14px;
+    
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .pinned-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pinned-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .pinned-item:active { cursor: grabbing; }
+  .pinned-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+  .pinned-item.drag-over {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.08);
+  }
+  .pinned-item-text {
+    flex: 1;
+    word-break: break-word;
+    outline: none;
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin: -1px -4px;
+    transition: background 0.2s;
+  }
+  .pinned-item-text:focus {
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .pinned-item-grip {
+    color: var(--text-dim);
+    opacity: 0.4;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .pinned-item-unpin {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 2px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .pinned-item-unpin:hover { opacity: 1; color: #f87171; }
+  a.memo-gmail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  a.memo-gmail-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .history-title {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .history-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 2px 10px;
+    border-radius: 100px;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: all 0.2s;
+  }
+  .history-item:hover {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.04);
+  }
+  .history-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .history-dot.upcoming { background: var(--accent); }
+  .history-dot.past { background: var(--text-dim); opacity: 0.4; }
+  .history-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .history-info-title {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .history-bell {
+    font-size: 12px;
+    flex-shrink: 0;
+    animation: pulseRing 2s ease-in-out infinite;
+  }
+  .history-info-date {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .history-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .history-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+  }
+  .history-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .history-btn.delete:hover {
+    border-color: #f87171;
+    color: #f87171;
+  }
+  .history-empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--text-dim);
+    font-size: 13px;
+    opacity: 0.6;
+  }
+
+  /* Pomodoro Timer */
+  .pomo-section {
+    margin-bottom: 20px;
+    animation: slideUp 0.7s ease both;
+  }
+  .pomo-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 24px;
+  }
+  .pomo-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .pomo-title {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .pomo-modes {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .pomo-mode-btn {
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .pomo-mode-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .pomo-mode-btn.active-work {
+    border-color: var(--ring-work);
+    background: rgba(59,130,246,0.15);
+    color: var(--ring-work);
+    font-weight: 600;
+  }
+  .pomo-mode-btn.active-short {
+    border-color: var(--ring-break);
+    background: rgba(74,222,128,0.12);
+    color: var(--ring-break);
+    font-weight: 600;
+  }
+  .pomo-mode-btn.active-long {
+    border-color: #A78BFA;
+    background: rgba(167,139,250,0.12);
+    color: #A78BFA;
+    font-weight: 600;
+  }
+
+  /* Horizontal layout: modes | ring(time inside) | controls */
+  .pomo-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .pomo-modes-top {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .pomo-modes-top .pomo-mode-btn {
+    text-align: center;
+    font-size: 12px;
+    padding: 7px 16px;
+  }
+  .pomo-display {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+  }
+  .pomo-ring {
+    position: absolute;
+    inset: 0;
+    width: 180px;
+    height: 180px;
+    transform: rotate(-90deg);
+  }
+  .pomo-ring-bg {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 10;
+  }
+  .pomo-tick { stroke: #ffffff; stroke-width: 1.5; opacity: 0.4; }
+  .pomo-ring-progress {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: butt;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  .pomo-ring-progress.work { stroke: var(--ring-work); }
+  .pomo-ring-progress.short { stroke: var(--ring-break); }
+  .pomo-ring-progress.long { stroke: #A78BFA; }
+  .pomo-time-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .pomo-spark-joy {
+    position: absolute;
+    top: calc(20% + 3px);
+    left: 52%;
+    transform: translateX(-50%);
+    font-family: 'EB Garamond', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.05;
+  }
+  .spark-does {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    position: relative;
+    left: -4px;
+  }
+  .pomo-time-text {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Michroma', sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+    -webkit-text-stroke: 0.8px currentColor;
+    letter-spacing: 2px;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .pomo-mode-label {
+    position: absolute;
+    top: calc(64% - 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .pomo-controls-bottom {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .pomo-btn {
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 60px;
+  }
+  .pomo-btn-start {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+  .pomo-btn-start:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px var(--accent-glow);
+  }
+  .pomo-btn-pause {
+    background: var(--surface2);
+    border: 1.5px solid var(--border) !important;
+    color: var(--text-dim);
+  }
+  .pomo-btn-pause:hover {
+    border-color: var(--accent) !important;
+    color: var(--accent);
+  }
+  .pomo-btn-reset {
+    background: var(--surface2);
+    border: 1.5px solid var(--border) !important;
+    color: var(--text-dim);
+    padding: 8px 18px;
+  }
+  .pomo-btn-reset:hover {
+    border-color: #f87171 !important;
+    color: #f87171;
+  }
+  .pomo-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .pomo-count span {
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  /* Gantt chart */
+  .pomo-gantt {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .pomo-gantt-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .pomo-gantt-bar-wrap {
+    position: relative;
+    height: 36px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .pomo-gantt-block {
+    position: absolute;
+    top: 4px;
+    height: 28px;
+    border-radius: 5px;
+    opacity: 0.85;
+    transition: width 1s linear;
+  }
+  .pomo-gantt-block.work { background: var(--ring-work); }
+  .pomo-gantt-block.short { background: var(--ring-break); }
+  .pomo-gantt-block.long { background: #A78BFA; }
+  .pomo-gantt-block-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .pomo-gantt-now {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--accent);
+    z-index: 2;
+    opacity: 0.7;
+  }
+  .pomo-gantt-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1px;
+  }
+  .pomo-gantt-tick {
+    font-size: 10px;
+    color: var(--text-dim);
+    opacity: 0.5;
+    width: 0;
+    text-align: center;
+  }
+  .pomo-gantt-tick:first-child { text-align: left; }
+  .pomo-gantt-tick:last-child { text-align: right; }
+  .pomo-gantt-summary {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .pomo-gantt-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pomo-gantt-legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 3px;
+  }
+  .pomo-gantt-event {
+    position: absolute;
+    top: 4px;
+    height: 28px;
+    border-radius: 5px;
+    background: rgba(255,179,71,0.25);
+    border: 1.5px solid rgba(255,179,71,0.5);
+    z-index: 1;
+    overflow: hidden;
+  }
+  .pomo-gantt-event-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--accent2);
+    white-space: nowrap;
+    pointer-events: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 90%;
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div class="particle" style="left:10%;animation-delay:0s"></div>
+<div class="particle" style="left:25%;animation-delay:1.5s"></div>
+<div class="particle" style="left:50%;animation-delay:3s"></div>
+<div class="particle" style="left:70%;animation-delay:4.5s"></div>
+<div class="particle" style="left:88%;animation-delay:6s"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">⌚</div>
+      <span class="logo-text">ReDesign your Life</span>
+    </div>
+    <button class="lock-btn" onclick="lockScreen()" title="画面ロック">🔒</button>
+  </div>
+
+  <!-- Screen Lock Overlay -->
+  <div class="lock-overlay" id="lockOverlay" style="display:none">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-msg">長押しで解除</div>
+    <div class="lock-progress" id="lockProgress"></div>
+  </div>
+
+  <!-- ═══ INPUT PHASE ═══ -->
+  <div id="inputPhase" class="phase active">
+    <!-- Pinned Memos -->
+    <div class="pinned-section" id="pinnedSection" style="display:none">
+      <div class="pinned-card">
+        <div class="pinned-header">
+          <span class="pinned-title">📌 ワクワクリスト</span>
+        </div>
+        <div class="pinned-list" id="pinnedList"></div>
+      </div>
+    </div>
+    <!-- Pomodoro Timer -->
+    <div class="pomo-section">
+      <div class="pomo-card">
+        <div class="pomo-header">
+          <span class="pomo-title">🍅 ポモドーロタイマー</span>
+          <button class="notif-help-btn" style="display:none;margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()">🔊 音テスト</button>
+          <div id="audioDiagResult" style="display:none;font-size:10px;padding:4px 8px;border-radius:6px;margin-top:4px;width:100%;text-align:left;font-family:monospace"></div>
+          <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="cycleAmbient()">🌧 雨音</button>
+        </div>
+        <div class="pomo-main">
+          <div class="pomo-modes-top">
+            <button class="pomo-mode-btn active-work" id="pomoModeWork" onclick="pomoSetMode('work')">集中 25分</button>
+            <button class="pomo-mode-btn" id="pomoModeShort" onclick="pomoSetMode('short')">休憩 5分</button>
+          </div>
+          <div class="pomo-display">
+            <svg class="pomo-ring" viewBox="0 0 100 100">
+              <circle class="pomo-ring-bg" cx="50" cy="50" r="42"/>
+              <circle class="pomo-ring-progress work" id="pomoRing" cx="50" cy="50" r="42"
+                stroke-dasharray="263.89" stroke-dashoffset="0"/>
+              <!-- 25 tick marks (1 per minute for 25min) -->
+              <g class="pomo-ticks" transform="rotate(90 50 50)">
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(14.4 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(28.8 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(43.2 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(57.6 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(72 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(86.4 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(100.8 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(115.2 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(129.6 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(144 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(158.4 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(172.8 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(187.2 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(201.6 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(216 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(230.4 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(244.8 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(259.2 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(273.6 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(288 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(302.4 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(316.8 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(331.2 50 50)"/>
+                <line x1="50" y1="3" x2="50" y2="8" class="pomo-tick" transform="rotate(345.6 50 50)"/>
+              </g>
+            </svg>
+            <div class="pomo-time-inner">
+              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span></div>
+              <div class="pomo-time-text" id="pomoTimeText">25:00</div>
+              <div class="pomo-mode-label" id="pomoModeLabel">集中</div>
+            </div>
+          </div>
+          <div class="pomo-controls-bottom">
+            <button class="pomo-btn pomo-btn-start" id="pomoStartBtn" onclick="pomoToggle()">▶</button>
+            <button class="pomo-btn pomo-btn-reset" onclick="pomoReset()" style="font-size:20px">↺</button>
+          </div>
+        </div>
+        <div class="pomo-count">完了セッション: <span id="pomoSessionCount">0</span></div>
+        <div class="pomo-gantt">
+          <div class="pomo-gantt-label">📊 今日のタイムライン</div>
+          <div class="pomo-gantt-bar-wrap" id="pomoGanttBar">
+            <div class="pomo-gantt-now" id="pomoGanttNow"></div>
+          </div>
+          <div class="pomo-gantt-ticks" id="pomoGanttTicks"></div>
+          <div class="pomo-gantt-summary" id="pomoGanttSummary"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Memo -->
+    <div class="memo-section">
+      <div class="memo-card">
+        <div class="memo-header">
+          <span class="memo-title">📝 ひとことメモ</span>
+        </div>
+        <div class="memo-input-row">
+          <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
+          <button class="memo-add-btn" onclick="addMemo()">追加</button>
+          <button class="memo-add-btn memo-pin-btn" onclick="addWaku()">📌</button>
+        </div>
+        <div class="memo-list" id="memoList"></div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="textarea-wrap">
+        <textarea id="userInput" oninput="updatePlaceholder();updateClearBtn()"></textarea>
+        <button class="input-clear-btn" id="inputClearBtn" onclick="clearInput()" style="display:none">✕</button>
+        <div class="placeholder-overlay" id="placeholderOverlay">
+          <span id="placeholderText"></span><span class="placeholder-cursor"></span>
+        </div>
+      </div>
+      <button class="btn-alarm-only" id="alarmOnlyBtn" onclick="parseAndAlarmOnly()" disabled style="margin-bottom:8px">
+        <span style="font-size:18px">🔔</span>
+        アラーム
+      </button>
+      <button class="btn-primary" id="parseBtn" onclick="parseInput()" disabled>
+        <span style="font-size:20px">📅</span>
+        カレンダーに登録
+      </button>
+      <div class="error-msg" id="errorMsg" style="display:none"></div>
+    </div>
+
+    <!-- History list -->
+    <div class="history-section" id="historySection" style="display:none">
+      <div class="history-header">
+        <span class="history-title">📋 予定</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="history-count" id="historyCount"></span>
+        </div>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- ═══ RESULT PHASE ═══ -->
+  <div id="resultPhase" class="phase">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-icon">✅</div>
+        <div>
+          <div class="result-title" id="resTitle"></div>
+          <span class="result-badge">解析完了</span>
+        </div>
+      </div>
+
+      <div class="result-body" id="resBody"></div>
+
+      <!-- Reminder section -->
+      <div class="reminder-section">
+        <div class="reminder-label">🔔 リマインド通知 <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="openNotifHelp()">通知設定 ?</button></div>
+        <div class="reminder-options">
+          <div class="reminder-chip" onclick="setReminder(0)" data-min="0">開始時</div>
+          <div class="reminder-chip" onclick="setReminder(5)" data-min="5">5分前</div>
+          <div class="reminder-chip" onclick="setReminder(10)" data-min="10">10分前</div>
+          <div class="reminder-chip" onclick="setReminder(15)" data-min="15">15分前</div>
+          <div class="reminder-chip" onclick="setReminder(30)" data-min="30">30分前</div>
+        </div>
+        <div id="reminderStatus"></div>
+      </div>
+
+      <!-- Edit section -->
+      <div class="edit-section" id="editSection">
+        <div class="edit-field">
+          <label>タイトル</label>
+          <input type="text" id="editTitle">
+        </div>
+        <div class="edit-field">
+          <label>開始日時</label>
+          <input type="datetime-local" id="editStart">
+        </div>
+        <div class="edit-field">
+          <label>終了日時</label>
+          <input type="datetime-local" id="editEnd">
+        </div>
+        <div class="edit-field">
+          <label>場所</label>
+          <input type="text" id="editLocation" placeholder="（任意）">
+        </div>
+        <div class="edit-field">
+          <label>メモ</label>
+          <input type="text" id="editDescription" placeholder="（任意）">
+        </div>
+      </div>
+
+      <div style="padding:0 28px 8px;display:flex;justify-content:flex-end">
+        <button class="edit-toggle" id="editToggle" onclick="toggleEdit()">✏️ 内容を編集</button>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn-alarm-only" onclick="alarmOnly()">
+          <span style="font-size:18px">🔔</span>
+          アラーム
+        </button>
+        <button class="btn-gcal" onclick="openGoogleCalendar()">
+          <span style="font-size:18px">📅</span>
+          Googleカレンダーに追加
+        </button>
+        <button class="btn-ics" onclick="downloadICS()">
+          <span style="font-size:16px">⬇</span>
+          .ics
+        </button>
+      </div>
+    </div>
+    <button class="btn-back" onclick="goBack()">← 入力に戻る</button>
+  </div>
+
+  <!-- Theme Picker -->
+  <div class="theme-picker">
+    
+    <div class="theme-picker-btns">
+      <button class="theme-btn active" data-theme="konmari-beige" onclick="setTheme('konmari-beige')" title="ときめき">
+        <span class="theme-swatch" style="background:#EDE6D8;border-color:#A89078"></span>
+      </button>
+      <button class="theme-btn" data-theme="pastel-pink" onclick="setTheme('pastel-pink')" title="ピンク">
+        <span class="theme-swatch" style="background:#FFF0F3;border-color:#F472B6"></span>
+      </button>
+      <button class="theme-btn" data-theme="pastel-mint" onclick="setTheme('pastel-mint')" title="ミント">
+        <span class="theme-swatch" style="background:#ECFDF5;border-color:#34D399"></span>
+      </button>
+      <button class="theme-btn" data-theme="pastel-lavender" onclick="setTheme('pastel-lavender')" title="ラベンダー">
+        <span class="theme-swatch" style="background:#F3F0FF;border-color:#8B5CF6"></span>
+      </button>
+      <button class="theme-btn" data-theme="pastel-sky" onclick="setTheme('pastel-sky')" title="スカイ">
+        <span class="theme-swatch" style="background:#EFF6FF;border-color:#3B82F6"></span>
+      </button>
+      <button class="theme-btn" data-theme="pastel-peach" onclick="setTheme('pastel-peach')" title="ピーチ">
+        <span class="theme-swatch" style="background:#FFF7ED;border-color:#F97316"></span>
+      </button>
+      <button class="theme-btn" data-theme="" onclick="setTheme('')" title="ダーク">
+        <span class="theme-swatch" style="background:#0A0E1A;border-color:#3B82F6"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
+  <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.23-09.57</div>
+
+  <!-- Notification help modal -->
+  <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
+    <div class="notif-help-content" onclick="event.stopPropagation()">
+      <h3>🔔 通知の許可方法</h3>
+      <div class="browser-section">
+        <div class="browser-name">Chrome（PC）</div>
+        <div class="browser-steps">
+          <span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br>
+          <span class="step-num">2</span>「通知」を「許可」に変更<br>
+          <span class="step-num">3</span>ページを再読み込み
+        </div>
+      </div>
+      <div class="browser-section">
+        <div class="browser-name">Chrome（スマホ）</div>
+        <div class="browser-steps">
+          <span class="step-num">1</span>アドレスバー右の ⋮ → 「サイトの設定」<br>
+          <span class="step-num">2</span>「通知」を「許可」に変更<br>
+          <span class="step-num">3</span>ページを再読み込み
+        </div>
+      </div>
+      <div class="browser-section">
+        <div class="browser-name">Safari（Mac）</div>
+        <div class="browser-steps">
+          <span class="step-num">1</span>Safari → 設定 → Webサイト → 通知<br>
+          <span class="step-num">2</span>このサイトを「許可」に変更<br>
+          <span class="step-num">3</span>ページを再読み込み
+        </div>
+      </div>
+      <div class="browser-section">
+        <div class="browser-name">Safari（iPhone）</div>
+        <div class="browser-steps">
+          <span class="step-num">1</span>このページを「ホーム画面に追加」<br>
+          <span class="step-num">2</span>ホーム画面から開き直す<br>
+          <span class="step-num">3</span>通知の許可ダイアログで「許可」をタップ
+        </div>
+      </div>
+      <div class="browser-section">
+        <div class="browser-name">Edge / Firefox</div>
+        <div class="browser-steps">
+          <span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br>
+          <span class="step-num">2</span>「通知」の権限を「許可」に変更<br>
+          <span class="step-num">3</span>ページを再読み込み
+        </div>
+      </div>
+      <button class="notif-help-close" onclick="document.getElementById('notifHelpModal').style.display='none'">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  State
+// ════════════════════════════════════════
+let currentEvent = null;
+let editOpen = false;
+let activeReminders = []; // {timerId, minBefore, fireTime, eventId}
+
+// ════════════════════════════════════════
+// Alarm AudioContext - kept alive from user gesture until alarm fires
+let alarmCtx = null;
+let alarmKeepAlive = null;
+
+function ensureAlarmCtx() {
+  if (alarmCtx && alarmCtx.state !== 'closed') {
+    if (alarmCtx.state === 'suspended') alarmCtx.resume();
+    return;
+  }
+  alarmCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Keep context alive with a silent node
+  alarmKeepAlive = alarmCtx.createGain();
+  alarmKeepAlive.gain.value = 0;
+  alarmKeepAlive.connect(alarmCtx.destination);
+  const silent = alarmCtx.createOscillator();
+  silent.frequency.value = 0;
+  silent.connect(alarmKeepAlive);
+  silent.start();
+}
+
+// Safari audio unlock
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+  try {
+    ensureAudioCtx();
+    ensureAlarmCtx();
+    audioUnlocked = true;
+  } catch(e) {}
+}
+
+['click', 'touchstart', 'touchend'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { once: false, passive: true });
+});
+
+// Generate rain noise (looping white noise with filtering)
+// ════════════════════════════════════════
+//  Ambient Audio (Rain / Campfire)
+// ════════════════════════════════════════
+let rainCtx = null;
+let rainProcessor = null;
+let rainGainNode = null;
+let rainActive = false;
+let rainBrown = 0;
+let ambientType = 'rain'; // 'rain', 'fire'
+
+function startRain() {
+  if (pomoTickMuted || rainActive || pomoRestoring) return;
+  ensureAudioCtx();
+  rainActive = true;
+  rainBrown = 0;
+
+  rainProcessor = rainCtx.createScriptProcessor(4096, 0, 1);
+  rainGainNode = rainCtx.createGain();
+  rainGainNode.gain.value = (ambientType === 'fire') ? 5.0 : 10.0;
+
+  if (ambientType === 'rain') {
+    rainProcessor.onaudioprocess = function(e) {
+      const output = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < output.length; i++) {
+        const w = Math.random() * 2 - 1;
+        rainBrown = (rainBrown + 0.01 * w) / 1.01;
+        const click = (Math.random() > 0.999)
+          ? Math.sin(Math.random() * 40) * (0.08 + Math.random() * 0.12) * Math.exp(-((i % 200) / 30))
+          : 0;
+        output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.04 * 0.5 + click * 0.2 + w * 0.002) * 0.5));
+      }
+    };
+    rainProcessor.connect(rainGainNode);
+    rainGainNode.connect(rainCtx.destination);
+
+  } else if (ambientType === 'fire') {
+    rainProcessor.onaudioprocess = function(e) {
+      const output = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < output.length; i++) {
+        const w = Math.random() * 2 - 1;
+        rainBrown = (rainBrown + 0.0005 * w) / 1.0005;
+        let crackle = 0;
+        if (Math.random() > 0.99997) {
+          crackle = (Math.random() * 2 - 1) * (0.5 + Math.random() * 0.5);
+        }
+        let pop = 0;
+        if (Math.random() > 0.99975) {
+          const f = 200 + Math.random() * 500;
+          pop = Math.sin(2 * Math.PI * f * (i % 150) / rainCtx.sampleRate) * 0.525 * Math.exp(-((i % 150) / 30));
+        }
+        const hiss = w * 0.0005;
+        const flicker = 1 + 0.1 * Math.sin(i * 0.0003 + Math.random() * 0.01);
+        output[i] = Math.max(-1, Math.min(1, (rainBrown * 0.05 + crackle + pop + hiss) * flicker * 1.2));
+      }
+    };
+    rainProcessor.connect(rainGainNode);
+    rainGainNode.connect(rainCtx.destination);
+  }
+}
+
+function stopRain() {
+  rainActive = false;
+  if (rainProcessor) {
+    rainProcessor.disconnect();
+    rainProcessor = null;
+  }
+  if (rainGainNode) {
+    rainGainNode.disconnect();
+    rainGainNode = null;
+  }
+}
+
+let pomoTickMuted = false;
+let rainPendingResume = false;
+let pomoRestoring = false;
+
+// Browser blocks autoplay after reload. Resume rain on first user tap.
+function setupAudioResume() {
+  function resumeAudio() {
+    if (rainPendingResume && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
+      rainPendingResume = false;
+      rainActive = false;
+      startRain();
+    }
+    document.removeEventListener('click', resumeAudio);
+    document.removeEventListener('touchstart', resumeAudio);
+  }
+  document.addEventListener('click', resumeAudio);
+  document.addEventListener('touchstart', resumeAudio);
+}
+
+// ── iOS Audio Fix ──
+// iOS suspends AudioContext without user gesture. Keep it alive.
+(function iosAudioFix() {
+  // 1) Resume AudioContext on any tap/click (persistent listener)
+  function resumeAllCtx() {
+    try {
+      if (rainCtx && rainCtx.state === 'suspended') rainCtx.resume();
+      if (alarmCtx && alarmCtx.state === 'suspended') alarmCtx.resume();
+    } catch(e) {}
+  }
+  document.addEventListener('touchstart', resumeAllCtx, { passive: true });
+  document.addEventListener('click', resumeAllCtx);
+
+  // 2) Resume audio when returning from background/lock screen
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      resumeAllCtx();
+      // Restart ambient sound if it should be playing
+      if (pomoRunning && pomoMode === 'work' && !pomoTickMuted && !rainActive) {
+        rainActive = false;
+        startRain();
+      }
+    }
+  });
+
+  // 3) Silent <audio> element keeps iOS audio session alive during screen lock
+  try {
+    const silentAudio = document.createElement('audio');
+    silentAudio.setAttribute('playsinline', '');
+    silentAudio.setAttribute('webkit-playsinline', '');
+    silentAudio.loop = true;
+    // Silent WAV (0.1s at 8kHz) keeps iOS audio session alive
+    silentAudio.src = 'data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    silentAudio.volume = 0.01;
+    document.body.appendChild(silentAudio);
+    // Start on first user gesture and keep trying
+    function startSilent() {
+      silentAudio.play().catch(() => {});
+    }
+    document.addEventListener('touchstart', startSilent, { passive: true });
+    document.addEventListener('click', startSilent);
+    // Replay when returning from background
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') startSilent();
+    });
+  } catch(e) {}
+})();
+
+const AMBIENT_CYCLE = [
+  { type: 'rain',  icon: '🌧', label: '雨音' },
+  { type: 'fire',  icon: '🔥', label: '焚き火' },
+  { type: 'mute',  icon: '🔇', label: '消音' },
+];
+
+function cycleAmbient() {
+  const currentIdx = AMBIENT_CYCLE.findIndex(a =>
+    pomoTickMuted ? a.type === 'mute' : a.type === ambientType
+  );
+  const nextIdx = (currentIdx + 1) % AMBIENT_CYCLE.length;
+  const next = AMBIENT_CYCLE[nextIdx];
+  const btn = document.getElementById('tickMuteBtn');
+
+  stopRain();
+
+  if (next.type === 'mute') {
+    pomoTickMuted = true;
+    btn.textContent = next.icon + ' ' + next.label;
+    btn.style.color = '#f87171';
+  } else {
+    pomoTickMuted = false;
+    ambientType = next.type;
+    btn.textContent = next.icon + ' ' + next.label;
+    btn.style.color = 'var(--text-dim)';
+    if (pomoRunning && pomoMode === 'work') {
+      startRain();
+    }
+  }
+  try { localStorage.setItem('aical_ambient', JSON.stringify({ type: next.type })); } catch(e) {}
+}
+
+function restoreAmbient() {
+  try {
+    const data = JSON.parse(localStorage.getItem('aical_ambient'));
+    if (!data) return;
+    const btn = document.getElementById('tickMuteBtn');
+    if (data.type === 'mute') {
+      pomoTickMuted = true;
+      btn.textContent = '🔇 消音';
+      btn.style.color = '#f87171';
+    } else {
+      const entry = AMBIENT_CYCLE.find(a => a.type === data.type);
+      if (entry) {
+        ambientType = entry.type;
+        pomoTickMuted = false;
+        btn.textContent = entry.icon + ' ' + entry.label;
+        btn.style.color = 'var(--text-dim)';
+      }
+    }
+  } catch(e) {}
+}
+
+// Ensure AudioContext exists (call from user gesture to unlock)
+let rainKeepAlive = null;
+
+function ensureAudioCtx() {
+  if (!rainCtx) {
+    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Keep rainCtx alive on iOS with silent oscillator
+    rainKeepAlive = rainCtx.createGain();
+    rainKeepAlive.gain.value = 0;
+    rainKeepAlive.connect(rainCtx.destination);
+    const silent = rainCtx.createOscillator();
+    silent.frequency.value = 0;
+    silent.connect(rainKeepAlive);
+    silent.start();
+  }
+  if (rainCtx.state === 'suspended') rainCtx.resume();
+}
+
+function audioDiag() {
+  const el = document.getElementById('audioDiagResult');
+  if (el.style.display === 'block') {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.innerHTML = '';
+  const lines = [];
+  function add(msg, ok) {
+    const prefix = ok ? '' : '【エラー】';
+    lines.push('<span style="color:' + (ok ? '#4ade80' : '#f87171') + '">' + prefix + msg + '</span>');
+    el.innerHTML = lines.join('<br>');
+  }
+
+  // Step 1: Create AudioContext
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { add('✗ AudioContext未対応', false); return; }
+    add('✓ AudioContext API あり', true);
+  } catch(e) { add('✗ API確認失敗: ' + e.message, false); return; }
+
+  // Step 2: Init and resume
+  try {
+    ensureAudioCtx();
+    add('✓ ctx作成 state=' + rainCtx.state, rainCtx.state !== 'closed');
+  } catch(e) { add('✗ ctx作成失敗: ' + e.message, false); return; }
+
+  // Step 3: Play tone
+  try {
+    rainCtx.resume().then(function() {
+      add('✓ resume後 state=' + rainCtx.state, rainCtx.state === 'running');
+      try {
+        const osc = rainCtx.createOscillator();
+        const gain = rainCtx.createGain();
+        gain.gain.value = 1.5;
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(rainCtx.destination);
+        osc.start();
+        osc.stop(rainCtx.currentTime + 0.5);
+        add('✓ 880Hz再生開始', true);
+        add('  sampleRate=' + rainCtx.sampleRate, true);
+        add('  currentTime=' + rainCtx.currentTime.toFixed(2), true);
+
+        // Step 4: playSound test
+        setTimeout(function() {
+          try {
+            playSound('pomo-work');
+            add('✓ playSound実行', true);
+            add('――――――――', true);
+            add('✓ 音声テスト正常', true);
+          } catch(e) {
+            add('✗ playSound失敗: ' + e.message, false);
+          }
+          const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+          add(isiOS ? '音が聞こえない場合→本体のサイレントスイッチを確認してください' : '音が聞こえない場合→本体の音量を確認してください', true);
+          setTimeout(function() { el.style.display = 'none'; }, 5000);
+        }, 600);
+      } catch(e) {
+        add('✗ Oscillator失敗: ' + e.message, false);
+      }
+    }).catch(function(e) {
+      add('✗ resume失敗: ' + e.message, false);
+    });
+  } catch(e) {
+    add('✗ 再生失敗: ' + e.message, false);
+  }
+}
+
+let pomoCountdownScheduled = false;
+
+function scheduleCountdown(secsLeft) {
+  try {
+    if (!rainCtx) return;
+    rainCtx.resume();
+    pomoCountdownScheduled = true;
+    const t0 = rainCtx.currentTime;
+
+    // Schedule ticks at precise 1-second intervals
+    for (let i = 0; i < secsLeft; i++) {
+      const t = t0 + i;
+      const g = rainCtx.createGain();
+      g.gain.setValueAtTime(0.1, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      g.connect(rainCtx.destination);
+      const o = rainCtx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = 523;
+      o.connect(g);
+      o.start(t);
+      o.stop(t + 0.06);
+    }
+
+    // Schedule chime at exact end
+    const tChime = t0 + secsLeft;
+    const gC = rainCtx.createGain();
+    gC.gain.setValueAtTime(0.1, tChime);
+    gC.gain.exponentialRampToValueAtTime(0.001, tChime + 1.0);
+    gC.connect(rainCtx.destination);
+    const oC = rainCtx.createOscillator();
+    oC.type = 'sawtooth';
+    oC.frequency.value = 1047;
+    oC.connect(gC);
+    oC.start(tChime);
+    oC.stop(tChime + 1.0);
+  } catch(e) {}
+}
+
+function playSound(type) {
+  try {
+    if (!rainCtx) return;
+    rainCtx.resume();
+
+    if (type === 'reminder') {
+      const gain = rainCtx.createGain();
+      gain.gain.value = 2.5;
+      gain.connect(rainCtx.destination);
+      let t = rainCtx.currentTime;
+      [{freq:880,dur:0.2},{freq:1100,dur:0.2},{freq:880,dur:0.2},{freq:1100,dur:0.3}].forEach(note => {
+        const osc = rainCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
+        osc.connect(gain);
+        osc.start(t);
+        osc.stop(t + note.dur * 0.9);
+        t += note.dur;
+      });
+      return;
+    }
+
+    // pomo-work / pomo-break: sawtooth + fade
+    const gain = rainCtx.createGain();
+    const t = rainCtx.currentTime;
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 1.0);
+    gain.connect(rainCtx.destination);
+    const osc = rainCtx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 1047;
+    osc.connect(gain);
+    osc.start(t);
+    osc.stop(t + 1.0);
+  } catch(e) {
+    console.warn('Audio error:', e);
+  }
+}
+
+const EXAMPLES = [
+  "来週の月曜 1400-1500 チームミーティング",
+  "明日 1030 歯医者の予約",
+  "3/1 1900 渋谷で友達とディナー",
+  "今週の金曜 1300-1430 プロジェクト報告会",
+  "2/20 終日 有給休暇",
+];
+
+// ════════════════════════════════════════
+//  Typing placeholder animation
+// ════════════════════════════════════════
+let exIdx = 0, charIdx = 0, typingTimer = null;
+
+function animatePlaceholder() {
+  const el = document.getElementById('placeholderText');
+  const example = EXAMPLES[exIdx];
+
+  if (charIdx <= example.length) {
+    el.textContent = example.slice(0, charIdx);
+    charIdx++;
+    typingTimer = setTimeout(animatePlaceholder, 60);
+  } else {
+    typingTimer = setTimeout(() => {
+      el.textContent = '';
+      charIdx = 0;
+      exIdx = (exIdx + 1) % EXAMPLES.length;
+      typingTimer = setTimeout(animatePlaceholder, 400);
+    }, 2200);
+  }
+}
+animatePlaceholder();
+
+function updatePlaceholder() {
+  const ta = document.getElementById('userInput');
+  const overlay = document.getElementById('placeholderOverlay');
+  const btn = document.getElementById('parseBtn');
+  const alarmBtn = document.getElementById('alarmOnlyBtn');
+  overlay.style.display = ta.value ? 'none' : 'block';
+  btn.disabled = !ta.value.trim();
+  alarmBtn.disabled = !ta.value.trim();
+}
+
+// ════════════════════════════════════════
+//  Japanese Natural Language Date Parser
+// ════════════════════════════════════════
+function parseInput() {
+  const text = document.getElementById('userInput').value.trim();
+  if (!text) return;
+
+  document.getElementById('errorMsg').style.display = 'none';
+
+  try {
+    currentEvent = parseJapaneseEvent(text);
+    showResult();
+  } catch (e) {
+    document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
+    document.getElementById('errorMsg').style.display = 'block';
+  }
+}
+
+async function parseAndAlarmOnly() {
+  const text = document.getElementById('userInput').value.trim();
+  if (!text) return;
+
+  document.getElementById('errorMsg').style.display = 'none';
+
+  try {
+    currentEvent = parseJapaneseEvent(text);
+  } catch (e) {
+    document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  // Set alarms directly without showing result screen
+  const ev = currentEvent;
+  if (ev.allDay) {
+    document.getElementById('errorMsg').textContent = '終日イベントにはアラームを設定できません';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  const perm = await requestNotificationPermission();
+  if (perm === 'unsupported') {
+    document.getElementById('errorMsg').textContent = 'このブラウザは通知に対応していません';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+  if (perm === 'denied') {
+    document.getElementById('errorMsg').textContent = 'ブラウザの通知がブロックされています。設定から許可してください';
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  ensureAudioCtx();
+  ensureAlarmCtx();
+
+  // Alarm-only: duration = 1 minute
+  const s = safeParseDate(ev.startDate);
+  const e1 = new Date(s.getTime() + 60000);
+  ev.endDate = e1.getFullYear() + '-' + String(e1.getMonth()+1).padStart(2,'0') + '-' + String(e1.getDate()).padStart(2,'0') + 'T' + String(e1.getHours()).padStart(2,'0') + ':' + String(e1.getMinutes()).padStart(2,'0') + ':00';
+
+  addToHistory(ev, true);
+
+  const eventTime = safeParseDate(ev.startDate).getTime();
+  const now = Date.now();
+  const fire5 = eventTime - 5 * 60 * 1000;
+  const fire1 = eventTime - 1 * 60 * 1000;
+  let anyAlarmSet = false;
+
+  if (fire5 > now) {
+    const tid5 = setTimeout(() => {
+      sendNotification(ev, 5);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 5 || r.eventStart !== ev.startDate);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, fire5 - now);
+    activeReminders.push({ timerId: tid5, minBefore: 5, fireTime: fire5, eventStart: ev.startDate });
+    anyAlarmSet = true;
+  }
+
+  if (fire1 > now) {
+    const tid1 = setTimeout(() => {
+      sendNotification(ev, 1);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 1 || r.eventStart !== ev.startDate);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, fire1 - now);
+    activeReminders.push({ timerId: tid1, minBefore: 1, fireTime: fire1, eventStart: ev.startDate });
+    anyAlarmSet = true;
+  }
+
+  if (!anyAlarmSet && eventTime > now) {
+    const tid0 = setTimeout(() => {
+      sendNotification(ev, 0);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 0 || r.eventStart !== ev.startDate);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, eventTime - now);
+    activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+    anyAlarmSet = true;
+  }
+
+  if (!anyAlarmSet) {
+    sendNotification(ev, 0);
+  }
+
+  renderHistory();
+
+  const startTime = safeParseDate(ev.startDate);
+  const h = String(startTime.getHours());
+  const m = String(startTime.getMinutes()).padStart(2, '0');
+
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('userInput').value = '';
+  updatePlaceholder();
+  updateClearBtn();
+
+  // Show confirmation briefly
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'block';
+  errEl.style.color = '#2DD4BF';
+  const alarmDesc = fire5 > now && fire1 > now ? '5分前・1分前' : fire5 > now ? '5分前' : fire1 > now ? '1分前' : eventTime > now ? '開始時' : '今すぐ';
+  errEl.textContent = `🔔 ${ev.title}（${h}:${m}）の${alarmDesc}にアラーム設定済み`;
+  setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = ''; }, 3000);
+}
+
+function parseJapaneseEvent(text) {
+  const now = new Date();
+  let year = now.getFullYear();
+  let month = null, day = null;
+  let startHour = null, startMin = 0;
+  let endHour = null, endMin = 0;
+  let allDay = false;
+  let location = null;
+  let title = text;
+
+  // ── Detect 終日 (all day) ──
+  if (/終日/.test(text)) {
+    allDay = true;
+    title = title.replace(/終日/, '').trim();
+  }
+
+  // ── Relative dates ──
+  const dayOfWeek = now.getDay();
+  const dayNames = { '日': 0, '月': 1, '火': 2, '水': 3, '木': 4, '金': 5, '土': 6 };
+
+  // 明日
+  if (/明日/.test(text)) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/明日[のは]?/, '').trim();
+  }
+  // 明後日
+  else if (/明後日/.test(text)) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 2);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/明後日[のは]?/, '').trim();
+  }
+  // 今日
+  else if (/今日/.test(text)) {
+    month = now.getMonth() + 1;
+    day = now.getDate();
+    title = title.replace(/今日[のは]?/, '').trim();
+  }
+  // 来週の○曜日
+  else if (/来週の?([日月火水木金土])曜?日?/.test(text)) {
+    const m = text.match(/来週の?([日月火水木金土])曜?日?/);
+    const targetDay = dayNames[m[1]];
+    const diff = ((targetDay - dayOfWeek + 7) % 7) || 7;
+    const d = new Date(now);
+    d.setDate(d.getDate() + diff + 7 * (diff > 0 ? 0 : 1));
+    // Actually "来週" means next week, so add 7 if needed
+    if (diff <= 0 || diff + now.getDate() <= now.getDate()) {
+      d.setDate(now.getDate() + diff + 7);
+    } else {
+      d.setDate(now.getDate() + ((targetDay - dayOfWeek + 7) % 7) + 7);
+    }
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/来週の?[日月火水木金土]曜?日?[のは]?/, '').trim();
+  }
+  // 今週の○曜日
+  else if (/今週の?([日月火水木金土])曜?日?/.test(text)) {
+    const m = text.match(/今週の?([日月火水木金土])曜?日?/);
+    const targetDay = dayNames[m[1]];
+    const diff = (targetDay - dayOfWeek + 7) % 7;
+    const d = new Date(now);
+    d.setDate(d.getDate() + (diff === 0 ? 0 : diff));
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/今週の?[日月火水木金土]曜?日?[のは]?/, '').trim();
+  }
+  // ○曜日 (this or next occurrence)
+  else if (/([日月火水木金土])曜日?/.test(text) && !/来週|今週/.test(text)) {
+    const m = text.match(/([日月火水木金土])曜日?/);
+    const targetDay = dayNames[m[1]];
+    let diff = (targetDay - dayOfWeek + 7) % 7;
+    if (diff === 0) diff = 7;
+    const d = new Date(now);
+    d.setDate(d.getDate() + diff);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/[日月火水木金土]曜日?[のは]?/, '').trim();
+  }
+
+  // ── Absolute dates: YYYY年M月D日, YYYY/M/D, M月D日, M/D ──
+  const absPatterns = [
+    { re: /(\d{4})[年\/\-](\d{1,2})[月\/\-](\d{1,2})日?/, groups: [1,2,3], hasYear: true },
+    { re: /(\d{1,2})[月\/\-](\d{1,2})日?/, groups: [1,2], hasYear: false },
+    { re: /(\d{1,2})月(\d{1,2})日/, groups: [1,2], hasYear: false },
+  ];
+
+  if (month === null) {
+    for (const pat of absPatterns) {
+      const m = text.match(pat.re);
+      if (m) {
+        if (pat.hasYear) {
+          year = parseInt(m[pat.groups[0]]);
+          month = parseInt(m[pat.groups[1]]);
+          day = parseInt(m[pat.groups[2]]);
+        } else {
+          month = parseInt(m[pat.groups[0]]);
+          day = parseInt(m[pat.groups[1]]);
+          // If the date has passed this year, use next year
+          const testDate = new Date(year, month - 1, day);
+          if (testDate < now) {
+            const diff = (now - testDate) / (1000*60*60*24);
+            if (diff > 14) year++;
+          }
+        }
+        title = title.replace(m[0], '').trim();
+        break;
+      }
+    }
+  }
+
+  // ── Time parsing ──
+  // Range: 14:00〜15:00, 14:00-15:00, 14時〜15時, etc.
+  const timeRangePatterns = [
+    /(\d{1,2}):(\d{2})\s*(?:〜|～|\-|ー|~|から)\s*(\d{1,2}):(\d{2})/,
+    /(\d{1,2})[時:](\d{0,2})\s*(?:〜|～|\-|ー|~|から)\s*(\d{1,2})[時:](\d{0,2})/,
+    /(?<!\d[\/\-])(\d{3,4})\s*(?:〜|～|\-|ー|~|から)\s*(\d{3,4})(?![\/\-]\d)/,
+    /(?<!\d[\/\-])(\d{1,2})\s*[〜～\-ー~]+\s*(\d{1,2})(?![\/\-]\d)/,
+  ];
+
+  let timeMatched = false;
+  for (const re of timeRangePatterns) {
+    const m = text.match(re);
+    if (m) {
+      if (m.length >= 5) {
+        // Full pattern: HH:MM - HH:MM or HH時MM - HH時MM
+        startHour = parseInt(m[1]);
+        startMin = m[2] ? parseInt(m[2]) : 0;
+        endHour = parseInt(m[3]);
+        endMin = m[4] ? parseInt(m[4]) : 0;
+      } else {
+        // 2-group pattern: bare numbers or simple
+        const a = m[1], b = m[2];
+        if (a.length >= 3) {
+          // Bare number range: 1030-1130
+          startHour = parseInt(a.length === 4 ? a.slice(0,2) : a.slice(0,1));
+          startMin = parseInt(a.length === 4 ? a.slice(2) : a.slice(1));
+          endHour = parseInt(b.length === 4 ? b.slice(0,2) : b.slice(0,1));
+          endMin = parseInt(b.length === 4 ? b.slice(2) : b.slice(1));
+        } else {
+          // Simple pattern: 11-12
+          startHour = parseInt(a);
+          startMin = 0;
+          endHour = parseInt(b);
+          endMin = 0;
+        }
+      }
+      title = title.replace(m[0], '').trim();
+      timeMatched = true;
+      break;
+    }
+  }
+
+  // Single time: 午前10時, 午後3時, 14:00, 14時, 14時から, etc.
+  if (!timeMatched) {
+    const singleTimePatterns = [
+      { re: /午前(\d{1,2})[時:](\d{0,2})分?(?:から|より|〜|～)?/, ampm: 'am' },
+      { re: /午後(\d{1,2})[時:](\d{0,2})分?(?:から|より|〜|～)?/, ampm: 'pm' },
+      { re: /朝(\d{1,2})[時:](\d{0,2})分?(?:から|より|〜|～)?/, ampm: 'am' },
+      { re: /夕方?(\d{1,2})[時:](\d{0,2})分?(?:から|より|〜|～)?/, ampm: 'pm' },
+      { re: /夜(\d{1,2})[時:](\d{0,2})分?(?:から|より|〜|～)?/, ampm: 'pm' },
+      { re: /(\d{1,2}):(\d{2})(?:から|より)?/, ampm: null },
+      { re: /(\d{1,2})時(\d{0,2})分?(?:から|より|〜|～)?/, ampm: null },
+      { re: /(?<![\/\-\d])(\d{3,4})(?:から|より|〜|～)?(?![\/\-\d])/, ampm: 'bare' },
+    ];
+
+    for (const pat of singleTimePatterns) {
+      const m = text.match(pat.re);
+      if (m) {
+        if (pat.ampm === 'bare') {
+          const raw = m[1];
+          if (raw.length === 4) {
+            startHour = parseInt(raw.slice(0, 2));
+            startMin = parseInt(raw.slice(2));
+          } else if (raw.length === 3) {
+            startHour = parseInt(raw.slice(0, 1));
+            startMin = parseInt(raw.slice(1));
+          }
+          if (startHour >= 0 && startHour <= 23 && startMin >= 0 && startMin <= 59) {
+            endHour = startHour + 1;
+            endMin = startMin;
+          } else {
+            startHour = null; startMin = 0;
+            continue;
+          }
+        } else {
+          startHour = parseInt(m[1]);
+          startMin = m[2] ? parseInt(m[2]) : 0;
+          if (pat.ampm === 'pm' && startHour < 12) startHour += 12;
+          if (pat.ampm === 'am' && startHour === 12) startHour = 0;
+          endHour = startHour + 1;
+          endMin = startMin;
+        }
+        title = title.replace(m[0], '').trim();
+        timeMatched = true;
+        break;
+      }
+    }
+  }
+
+  // ── Safety: ensure end = start + 1h if endHour not properly set ──
+  if (timeMatched && startHour !== null && (endHour === null || endHour === undefined)) {
+    endHour = startHour + 1;
+    endMin = startMin;
+  }
+  if (timeMatched && endHour !== null && endHour <= startHour && endMin <= startMin) {
+    endHour = startHour + 1;
+    endMin = startMin;
+  }
+
+  // ── Location: ○○で, ○○にて ──
+  const locMatch = text.match(/(?:場所[：:]?\s*)(.+?)(?:\s|$)/);
+  const locMatch2 = text.match(/(.{2,10}?)(?:で|にて)(?:\s|$)/);
+  if (locMatch) {
+    location = locMatch[1];
+    title = title.replace(locMatch[0], '').trim();
+  } else if (locMatch2 && !/まで|つい|のみ/.test(locMatch2[1])) {
+    location = locMatch2[1];
+    title = title.replace(locMatch2[0], '').trim();
+  }
+
+  // ── Clean up title ──
+  title = title
+    .replace(/^[\s　、,。.：:]+/, '')
+    .replace(/[\s　、,。.：:]+$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Remove leading/trailing Japanese particles left over from parsing
+  title = title
+    .replace(/^(?:から|まで|にて|では|には|への|での|の|に|は|を|で|が|へ|と|も|、|\s)+/, '')
+    .replace(/(?:から|まで|にて|では|には|への|での|の|に|は|を|で|が|へ|と|も|、|\s)+$/, '')
+    .trim();
+
+  if (!title) title = '予定';
+
+  // ── Default date if none found ──
+  if (month === null) {
+    // Default to today
+    month = now.getMonth() + 1;
+    day = now.getDate();
+  }
+
+  // ── Build ISO strings ──
+  const pad = n => String(n).padStart(2, '0');
+
+  if (allDay || (!timeMatched && startHour === null)) {
+    allDay = true;
+    const startDate = `${year}-${pad(month)}-${pad(day)}T00:00:00`;
+    const endD = new Date(year, month - 1, day);
+    endD.setDate(endD.getDate() + 1);
+    const endDate = `${endD.getFullYear()}-${pad(endD.getMonth()+1)}-${pad(endD.getDate())}T00:00:00`;
+    return { title, startDate, endDate, allDay: true, location, description: null };
+  }
+
+  const startDate = `${year}-${pad(month)}-${pad(day)}T${pad(startHour)}:${pad(startMin)}:00`;
+  const endDate = `${year}-${pad(month)}-${pad(day)}T${pad(endHour)}:${pad(endMin)}:00`;
+
+  return { title, startDate, endDate, allDay: false, location, description: null };
+}
+
+// ════════════════════════════════════════
+//  Show result
+// ════════════════════════════════════════
+function showResult() {
+  clearAllReminders();
+  document.getElementById('inputPhase').classList.remove('active');
+  document.getElementById('resultPhase').classList.add('active');
+  editOpen = false;
+  document.getElementById('editSection').classList.remove('open');
+  document.getElementById('editToggle').textContent = '✏️ 内容を編集';
+
+  renderResult();
+
+  // Default: set 5min reminder
+  if (!currentEvent.allDay) {
+    setReminder(5);
+  }
+}
+
+function renderResult() {
+  const ev = getEditedEvent();
+  document.getElementById('resTitle').textContent = ev.title;
+
+  let bodyHTML = '';
+
+  bodyHTML += `<div class="detail-row">
+    <div class="detail-icon">🗓</div>
+    <div>
+      <div class="detail-label">開始</div>
+      <div class="detail-value">${formatJP(ev.startDate, ev.allDay)}${ev.allDay ? ' （終日）' : ''}</div>
+      ${!ev.allDay ? `<div class="time-adjuster">
+        <button class="time-adj-btn" onclick="adjustTime('start', -15)">−</button>
+        <span class="time-adj-label">15分</span>
+        <button class="time-adj-btn" onclick="adjustTime('start', 15)">+</button>
+      </div>` : ''}
+    </div>
+  </div>`;
+
+  if (!ev.allDay) {
+    bodyHTML += `<div class="detail-row">
+      <div class="detail-icon">🕐</div>
+      <div>
+        <div class="detail-label">終了</div>
+        <div class="detail-value">${formatJP(ev.endDate, false)}</div>
+        <div class="time-adjuster">
+          <button class="time-adj-btn" onclick="adjustTime('end', -15)">−</button>
+          <span class="time-adj-label">15分</span>
+          <button class="time-adj-btn" onclick="adjustTime('end', 15)">+</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (ev.location) {
+    bodyHTML += `<div class="detail-row">
+      <div class="detail-icon">📍</div>
+      <div>
+        <div class="detail-label">場所</div>
+        <div class="detail-value">${escHTML(ev.location)}</div>
+      </div>
+    </div>`;
+  }
+
+  if (ev.description) {
+    bodyHTML += `<div class="detail-row">
+      <div class="detail-icon">📝</div>
+      <div>
+        <div class="detail-label">メモ</div>
+        <div class="detail-value">${escHTML(ev.description)}</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('resBody').innerHTML = bodyHTML;
+
+  // Populate edit fields
+  document.getElementById('editTitle').value = ev.title;
+  document.getElementById('editStart').value = ev.startDate.slice(0, 16);
+  document.getElementById('editEnd').value = ev.endDate.slice(0, 16);
+  document.getElementById('editLocation').value = ev.location || '';
+  document.getElementById('editDescription').value = ev.description || '';
+}
+
+function getEditedEvent() {
+  if (!editOpen) return currentEvent;
+  return {
+    title: document.getElementById('editTitle').value || currentEvent.title,
+    startDate: (document.getElementById('editStart').value || currentEvent.startDate.slice(0,16)) + ':00',
+    endDate: (document.getElementById('editEnd').value || currentEvent.endDate.slice(0,16)) + ':00',
+    location: document.getElementById('editLocation').value || null,
+    description: document.getElementById('editDescription').value || null,
+    allDay: currentEvent.allDay,
+  };
+}
+
+function toggleEdit() {
+  editOpen = !editOpen;
+  document.getElementById('editSection').classList.toggle('open', editOpen);
+  document.getElementById('editToggle').textContent = editOpen ? '▲ 編集を閉じる' : '✏️ 内容を編集';
+  if (!editOpen) {
+    // Apply edits
+    currentEvent = getEditedEvent();
+    currentEvent.allDay = currentEvent.allDay;
+    renderResult();
+  }
+}
+
+// ════════════════════════════════════════
+//  History (localStorage)
+// ════════════════════════════════════════
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('aical_history') || '[]');
+  } catch(e) { return []; }
+}
+
+function saveHistory(list) {
+  try {
+    localStorage.setItem('aical_history', JSON.stringify(list));
+  } catch(e) {}
+}
+
+function addToHistory(ev, alarmOnly) {
+  const list = getHistory();
+  const entry = {
+    id: Date.now(),
+    title: ev.title,
+    startDate: ev.startDate,
+    endDate: ev.endDate,
+    allDay: ev.allDay,
+    location: ev.location || null,
+    description: ev.description || null,
+    registeredAt: new Date().toISOString(),
+    alarmOnly: alarmOnly || false,
+  };
+  list.unshift(entry);
+  // Keep max 50 entries
+  if (list.length > 50) list.length = 50;
+  saveHistory(list);
+  renderHistory();
+  ganttRender();
+}
+
+function deleteFromHistory(id) {
+  let list = getHistory();
+  const entry = list.find(e => e.id === id);
+
+  if (entry && !entry.alarmOnly) {
+    // Build Google Calendar date view URL
+    const d = safeParseDate(entry.startDate);
+    const dateStr = d.getFullYear() + '/' +
+      String(d.getMonth() + 1).padStart(2, '0') + '/' +
+      String(d.getDate()).padStart(2, '0');
+    const gcalUrl = `https://calendar.google.com/calendar/r/day/${dateStr}`;
+
+    // Show confirmation with link
+    const msg = `「${entry.title}」を履歴から削除します。\nGoogleカレンダーからも手動で削除しますか？`;
+    if (confirm(msg)) {
+      const a = document.createElement('a');
+      a.href = gcalUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
+
+  list = list.filter(e => e.id !== id);
+  saveHistory(list);
+  renderHistory();
+  ganttRender();
+}
+
+function reopenFromHistory(id) {
+  const list = getHistory();
+  const entry = list.find(e => e.id === id);
+  if (!entry) return;
+  currentEvent = {
+    title: entry.title,
+    startDate: entry.startDate,
+    endDate: entry.endDate,
+    allDay: entry.allDay,
+    location: entry.location,
+    description: entry.description,
+  };
+  showResult();
+}
+
+function renderHistory() {
+  const list = getHistory();
+  const section = document.getElementById('historySection');
+  const container = document.getElementById('historyList');
+  const countEl = document.getElementById('historyCount');
+
+  if (list.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  countEl.textContent = list.length + '件';
+
+  const now = new Date();
+  container.innerHTML = list.map(entry => {
+    const isUpcoming = safeParseDate(entry.startDate) > now;
+    const dotClass = isUpcoming ? 'upcoming' : 'past';
+    const dateStr = entry.allDay
+      ? formatJP(entry.startDate, true) + '（終日）'
+      : entry.alarmOnly
+        ? formatJP(entry.startDate, false)
+        : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
+    return `<div class="history-item">
+      <div class="history-dot ${dotClass}"></div>
+      <div class="history-info">
+        <div class="history-info-title">${hasReminder(entry.startDate) ? '<span class="history-bell">🔔</span>' : ''}${escHTML(entry.title)}</div>
+        <div class="history-info-date">${escHTML(dateStr)}${entry.location ? ' 📍' + escHTML(entry.location) : ''}</div>
+      </div>
+      <div class="history-actions">
+        ${entry.alarmOnly ? '' : '<button class="history-btn" onclick="reopenFromHistory(' + entry.id + ')" title="詳細を見る">📅</button>'}
+        <button class="history-btn delete" onclick="deleteFromHistory(${entry.id})" title="削除">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  Google Calendar & ICS
+// ════════════════════════════════════════
+function openGoogleCalendar() {
+  const ev = getEditedEvent();
+  const base = 'https://calendar.google.com/calendar/render';
+  const params = new URLSearchParams();
+  params.set('action', 'TEMPLATE');
+  params.set('text', ev.title);
+
+  const fmt = s => s.replace(/[-:]/g, '');
+
+  if (ev.allDay) {
+    const sd = ev.startDate.split('T')[0].replace(/-/g, '');
+    const ed = ev.endDate.split('T')[0].replace(/-/g, '');
+    params.set('dates', sd + '/' + ed);
+  } else {
+    params.set('dates', fmt(ev.startDate) + '/' + fmt(ev.endDate));
+  }
+
+  if (ev.location) params.set('location', ev.location);
+  if (ev.description) params.set('details', ev.description);
+
+  const url = base + '?' + params.toString();
+  addToHistory(ev);
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function downloadICS() {
+  const ev = getEditedEvent();
+  addToHistory(ev);
+  const fmt = s => s.replace(/[-:]/g, '');
+  const now = fmt(new Date().toISOString().replace(/\.\d+/, ''));
+
+  let dtStart, dtEnd;
+  if (ev.allDay) {
+    dtStart = 'DTSTART;VALUE=DATE:' + ev.startDate.split('T')[0].replace(/-/g, '');
+    dtEnd = 'DTEND;VALUE=DATE:' + ev.endDate.split('T')[0].replace(/-/g, '');
+  } else {
+    dtStart = 'DTSTART:' + fmt(ev.startDate);
+    dtEnd = 'DTEND:' + fmt(ev.endDate);
+  }
+
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//totonoe-jikan//JP//EN',
+    'BEGIN:VEVENT', dtStart, dtEnd, 'DTSTAMP:' + now,
+    'SUMMARY:' + ev.title,
+    ev.location ? 'LOCATION:' + ev.location : '',
+    ev.description ? 'DESCRIPTION:' + ev.description : '',
+    'UID:' + Date.now() + '@totonoe-jikan',
+    'END:VEVENT', 'END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+
+  const blob = new Blob([lines], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = ev.title + '.ics';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function alarmOnly() {
+  const ev = getEditedEvent();
+  if (ev.allDay) {
+    showReminderStatus('error', '終日イベントにはアラームを設定できません');
+    return;
+  }
+
+  const perm = await requestNotificationPermission();
+  if (perm === 'unsupported') {
+    showReminderStatus('error', 'このブラウザは通知に対応していません');
+    return;
+  }
+  if (perm === 'denied') {
+    showReminderStatus('error', 'ブラウザの通知がブロックされています。設定から許可してください');
+    return;
+  }
+
+  ensureAudioCtx();
+  ensureAlarmCtx();
+
+  // Alarm-only: duration = 1 minute
+  const s2 = safeParseDate(ev.startDate);
+  const e2 = new Date(s2.getTime() + 60000);
+  ev.endDate = e2.getFullYear() + '-' + String(e2.getMonth()+1).padStart(2,'0') + '-' + String(e2.getDate()).padStart(2,'0') + 'T' + String(e2.getHours()).padStart(2,'0') + ':' + String(e2.getMinutes()).padStart(2,'0') + ':00';
+
+  addToHistory(ev, true);
+
+  const eventTime = safeParseDate(ev.startDate).getTime();
+  const now = Date.now();
+
+  const fire5 = eventTime - 5 * 60 * 1000;
+  const fire1 = eventTime - 1 * 60 * 1000;
+  let anyAlarmSet = false;
+
+  if (fire5 > now) {
+    const existing5 = activeReminders.find(r => r.minBefore === 5);
+    if (!existing5) {
+      const tid5 = setTimeout(() => {
+        sendNotification(ev, 5);
+        activeReminders = activeReminders.filter(r => r.minBefore !== 5);
+        updateReminderChips();
+        updateReminderStatusText();
+        renderHistory();
+      }, fire5 - now);
+      activeReminders.push({ timerId: tid5, minBefore: 5, fireTime: fire5, eventStart: ev.startDate });
+      anyAlarmSet = true;
+    }
+  }
+
+  if (fire1 > now) {
+    const existing1 = activeReminders.find(r => r.minBefore === 1);
+    if (!existing1) {
+      const tid1 = setTimeout(() => {
+        sendNotification(ev, 1);
+        activeReminders = activeReminders.filter(r => r.minBefore !== 1);
+        updateReminderChips();
+        updateReminderStatusText();
+        renderHistory();
+      }, fire1 - now);
+      activeReminders.push({ timerId: tid1, minBefore: 1, fireTime: fire1, eventStart: ev.startDate });
+      anyAlarmSet = true;
+    }
+  }
+
+  // If both before-alarms already passed but event time is still future, alarm at event time
+  if (!anyAlarmSet && eventTime > now) {
+    const tid0 = setTimeout(() => {
+      sendNotification(ev, 0);
+      activeReminders = activeReminders.filter(r => r.minBefore !== 0);
+      updateReminderChips();
+      updateReminderStatusText();
+      renderHistory();
+    }, eventTime - now);
+    activeReminders.push({ timerId: tid0, minBefore: 0, fireTime: eventTime, eventStart: ev.startDate });
+    anyAlarmSet = true;
+  }
+
+  // If event time also passed, fire immediately
+  if (!anyAlarmSet) {
+    sendNotification(ev, 0);
+  }
+
+  updateReminderChips();
+  renderHistory();
+
+  const startTime = safeParseDate(ev.startDate);
+  const h = String(startTime.getHours());
+  const m = String(startTime.getMinutes()).padStart(2, '0');
+  const alarmDesc = fire5 > now && fire1 > now ? '5分前・1分前' : fire5 > now ? '5分前' : fire1 > now ? '1分前' : eventTime > now ? '開始時' : '今すぐ';
+  showReminderStatus('success', `🔔 ${ev.title}（${h}:${m}）の${alarmDesc}にアラームを設定しました`);
+
+  // Go back to input after short delay
+  setTimeout(() => { goBack(); }, 1500);
+}
+
+
+// ════════════════════════════════════════
+//  Utilities
+// ════════════════════════════════════════
+function safeParseDate(str) {
+  // Safari doesn't reliably parse "YYYY-MM-DDTHH:MM:SS" without timezone
+  if (typeof str === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(str)) {
+    const parts = str.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):?(\d{2})?/);
+    if (parts) {
+      return new Date(+parts[1], +parts[2]-1, +parts[3], +parts[4], +parts[5], +(parts[6]||0));
+    }
+  }
+  return new Date(str);
+}
+
+function formatJP(dateStr, allDay) {
+  const d = safeParseDate(dateStr);
+  const days = ['日','月','火','水','木','金','土'];
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const dd = d.getDate();
+  const w = days[d.getDay()];
+
+  if (allDay) return `${y}年${m}月${dd}日（${w}）`;
+
+  const h = String(d.getHours());
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${y}年${m}月${dd}日（${w}） ${h}:${min}`;
+}
+
+function escHTML(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ════════════════════════════════════════
+//  Time adjuster (15min increments)
+// ════════════════════════════════════════
+function adjustTime(which, minutes) {
+  const key = which === 'start' ? 'startDate' : 'endDate';
+  const d = safeParseDate(currentEvent[key]);
+  d.setMinutes(d.getMinutes() + minutes);
+
+  const pad = n => String(n).padStart(2, '0');
+  currentEvent[key] = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+
+  // Ensure end is after start
+  if (safeParseDate(currentEvent.endDate) <= safeParseDate(currentEvent.startDate)) {
+    if (which === 'start') {
+      const end = safeParseDate(currentEvent.startDate);
+      end.setMinutes(end.getMinutes() + 15);
+      currentEvent.endDate = `${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}:00`;
+    } else {
+      return; // Don't allow end before start
+    }
+  }
+
+  renderResult();
+}
+
+// ════════════════════════════════════════
+//  Reminders
+// ════════════════════════════════════════
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  const result = await Notification.requestPermission();
+  return result;
+}
+
+async function setReminder(minBefore) {
+  const ev = getEditedEvent();
+  if (ev.allDay) {
+    showReminderStatus('error', '終日イベントにはリマインダーを設定できません');
+    return;
+  }
+
+  // Check notification support & permission
+  const perm = await requestNotificationPermission();
+  if (perm === 'unsupported') {
+    showReminderStatus('error', 'このブラウザは通知に対応していません');
+    return;
+  }
+  if (perm === 'denied') {
+    showReminderStatus('error', 'ブラウザの通知がブロックされています。設定から許可してください');
+    return;
+  }
+
+  // Check if already set
+  const existing = activeReminders.find(r => r.minBefore === minBefore);
+  if (existing) {
+    // Remove it (toggle off)
+    clearTimeout(existing.timerId);
+    activeReminders = activeReminders.filter(r => r.minBefore !== minBefore);
+    updateReminderChips();
+    updateReminderStatusText();
+    renderHistory();
+    return;
+  }
+
+  ensureAudioCtx();
+
+  ensureAlarmCtx();
+  // Calculate fire time
+  const eventTime = safeParseDate(ev.startDate).getTime();
+  const fireTime = eventTime - (minBefore * 60 * 1000);
+  const now = Date.now();
+
+  if (fireTime <= now) {
+    showReminderStatus('warning', 'その時間はすでに過ぎています');
+    return;
+  }
+
+  const delay = fireTime - now;
+  const timerId = setTimeout(() => {
+    sendNotification(ev, minBefore);
+    activeReminders = activeReminders.filter(r => r.minBefore !== minBefore);
+    updateReminderChips();
+    updateReminderStatusText();
+    renderHistory();
+  }, delay);
+
+  activeReminders.push({ timerId, minBefore, fireTime, eventStart: ev.startDate });
+  updateReminderChips();
+
+  const label = minBefore === 0 ? '開始時' : `${minBefore}分前`;
+  showReminderStatus('success', `🔔 ${label}に通知します（このページを開いたままにしてください）`);
+  renderHistory();
+}
+
+// Notification debounce - batch overlapping alarms
+let notifQueue = [];
+let notifTimer = null;
+
+function sendNotification(ev, minBefore) {
+  const label = minBefore === 0 ? 'まもなく開始' : `あと${minBefore}分`;
+  const startTime = safeParseDate(ev.startDate);
+  const h = String(startTime.getHours());
+  const m = String(startTime.getMinutes()).padStart(2, '0');
+
+  notifQueue.push({ title: ev.title, label, time: `${h}:${m}`, location: ev.location });
+
+  // If first in batch, schedule the actual alarm
+  if (!notifTimer) {
+    notifTimer = setTimeout(flushNotifications, 500);
+  }
+}
+
+function flushNotifications() {
+  notifTimer = null;
+  const batch = notifQueue.splice(0);
+  if (batch.length === 0) return;
+
+  // 1) Stop rain
+  const wasRainActive = rainActive;
+  stopRain();
+
+  // 2) Show notifications
+  batch.forEach(n => {
+    try {
+      new Notification(`📅 ${n.title}`, {
+        body: `${n.label}（${n.time}〜）${n.location ? '\n📍 ' + n.location : ''}`,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
+      });
+    } catch(e) {}
+  });
+
+  // 3) Resume rain helper
+  let resumed = false;
+  function resumeRainOnce() {
+    if (resumed) return;
+    resumed = true;
+    if (wasRainActive && pomoRunning && pomoMode === 'work' && !pomoTickMuted) {
+      rainActive = false;
+      startRain();
+    }
+  }
+
+  // 4) Play alarm once after 1s
+  setTimeout(() => {
+    try {
+      if (alarmCtx && alarmCtx.state !== 'closed') {
+        if (alarmCtx.state === 'suspended') alarmCtx.resume();
+        const notes = [
+          { freq: 880, dur: 0.2 },
+          { freq: 1100, dur: 0.2 },
+          { freq: 880, dur: 0.2 },
+          { freq: 1100, dur: 0.3 },
+        ];
+        const gain = alarmCtx.createGain();
+        gain.gain.value = 2.5;
+        gain.connect(alarmCtx.destination);
+
+        let t = alarmCtx.currentTime;
+        notes.forEach(note => {
+          const osc = alarmCtx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = note.freq;
+          osc.connect(gain);
+          osc.start(t);
+          osc.stop(t + note.dur * 0.9);
+          t += note.dur;
+        });
+
+        setTimeout(resumeRainOnce, 1500);
+      } else {
+        resumeRainOnce();
+      }
+    } catch(e) {
+      console.warn('Alarm error:', e);
+      resumeRainOnce();
+    }
+  }, 1000);
+
+  setTimeout(resumeRainOnce, 4000);
+}
+
+function updateReminderChips() {
+  document.querySelectorAll('.reminder-chip').forEach(chip => {
+    const min = parseInt(chip.dataset.min);
+    const isActive = activeReminders.some(r => r.minBefore === min);
+    chip.classList.toggle('active', isActive);
+  });
+}
+
+function updateReminderStatusText() {
+  if (activeReminders.length === 0) {
+    document.getElementById('reminderStatus').innerHTML = '';
+    return;
+  }
+  const labels = activeReminders.map(r => r.minBefore === 0 ? '開始時' : `${r.minBefore}分前`).join('、');
+  showReminderStatus('success', `🔔 通知予約中：${labels}`);
+}
+
+function showReminderStatus(type, message) {
+  const el = document.getElementById('reminderStatus');
+  if (type === 'success') {
+    el.innerHTML = `<div class="reminder-status"><div class="reminder-pulse"></div>${escHTML(message)}</div>`;
+  } else if (type === 'warning') {
+    el.innerHTML = `<div class="reminder-status warning">⚠️ ${escHTML(message)}</div>`;
+  } else {
+    el.innerHTML = `<div class="reminder-status error">❌ ${escHTML(message)}</div>
+      <button class="notif-help-btn" onclick="openNotifHelp()">🔧 通知の許可方法を確認</button>`;
+  }
+}
+
+function openNotifHelp() {
+  document.getElementById('notifHelpModal').style.display = 'flex';
+}
+
+function closeNotifHelp(e) {
+  if (e.target === e.currentTarget) {
+    document.getElementById('notifHelpModal').style.display = 'none';
+  }
+}
+
+function clearAllReminders() {
+  activeReminders.forEach(r => clearTimeout(r.timerId));
+  activeReminders = [];
+  updateReminderChips();
+  document.getElementById('reminderStatus').innerHTML = '';
+  renderHistory();
+}
+
+function hasReminder(eventStart) {
+  return activeReminders.some(r => r.eventStart === eventStart);
+}
+
+function goBack() {
+  clearAllReminders();
+  document.getElementById('resultPhase').classList.remove('active');
+  document.getElementById('inputPhase').classList.add('active');
+  updatePlaceholder();
+  currentEvent = null;
+  renderHistory();
+}
+
+// Ctrl+Enter to submit
+document.getElementById('userInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) parseInput();
+});
+
+function clearInput() {
+  const ta = document.getElementById('userInput');
+  ta.value = '';
+  updatePlaceholder();
+  updateClearBtn();
+  ta.focus();
+}
+
+function updateClearBtn() {
+  const btn = document.getElementById('inputClearBtn');
+  btn.style.display = document.getElementById('userInput').value.length > 0 ? 'flex' : 'none';
+}
+
+// Render history on load
+renderHistory();
+
+// ════════════════════════════════════════
+//  Memo
+// ════════════════════════════════════════
+function getMemos() {
+  try { return JSON.parse(localStorage.getItem('aical_memos') || '[]'); }
+  catch(e) { return []; }
+}
+function saveMemos(list) {
+  localStorage.setItem('aical_memos', JSON.stringify(list));
+}
+
+function addMemo() {
+  const input = document.getElementById('memoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const list = getMemos();
+  list.unshift({ id: Date.now(), text, createdAt: new Date().toISOString(), pinned: false, pinOrder: 0 });
+  if (list.length > 100) list.length = 100;
+  saveMemos(list);
+  input.value = '';
+  renderMemos();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toastMsg');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 1500);
+}
+
+function addWaku() {
+  const input = document.getElementById('memoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const list = getMemos();
+  const pinnedCount = list.filter(m => m.pinned).length;
+  list.unshift({ id: Date.now(), text, createdAt: new Date().toISOString(), pinned: true, pinOrder: pinnedCount + 1 });
+  if (list.length > 100) list.length = 100;
+  saveMemos(list);
+  input.value = '';
+  renderMemos();
+  showToast('📌 ワクワクリストに追加しました');
+}
+
+function deleteMemo(id) {
+  let list = getMemos();
+  list = list.filter(m => m.id !== id);
+  const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  pinned.forEach((m, i) => { m.pinOrder = i; });
+  saveMemos(list);
+  renderMemos();
+}
+
+function togglePin(id) {
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo) return;
+  memo.pinned = !memo.pinned;
+  if (memo.pinned) {
+    const otherPinned = list.filter(m => m.pinned && m.id !== id);
+    memo.pinOrder = otherPinned.length > 0 ? Math.max(...otherPinned.map(m => m.pinOrder || 0)) + 1 : 0;
+    const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+    pinned.forEach((m, i) => { m.pinOrder = i; });
+  } else {
+    memo.pinOrder = 0;
+    const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+    pinned.forEach((m, i) => { m.pinOrder = i; });
+  }
+  saveMemos(list);
+  renderMemos();
+}
+
+function unpinMemo(id) {
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo) return;
+  memo.pinned = false;
+  memo.pinOrder = 0;
+  const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  pinned.forEach((m, i) => { m.pinOrder = i; });
+  saveMemos(list);
+  renderMemos();
+}
+
+function editPinnedMemo(id, el) {
+  const newText = el.textContent.trim();
+  if (!newText) return;
+  const list = getMemos();
+  const memo = list.find(m => m.id === id);
+  if (!memo || memo.text === newText) return;
+  memo.text = newText;
+  saveMemos(list);
+  renderMemos();
+}
+
+function renderMemos() {
+  const list = getMemos();
+  const el = document.getElementById('memoList');
+
+  // Render pinned area
+  const pinnedMemos = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  const pinnedSection = document.getElementById('pinnedSection');
+  const pinnedList = document.getElementById('pinnedList');
+
+  if (pinnedMemos.length > 0) {
+    pinnedSection.style.display = '';
+    pinnedList.innerHTML = pinnedMemos.map(m => `<div class="pinned-item" draggable="true" data-id="${m.id}">
+      <span class="pinned-item-grip">⠿</span>
+      <span class="pinned-item-text" contenteditable="true" onblur="editPinnedMemo(${m.id}, this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escHTML(m.text)}</span>
+      <button class="pinned-item-unpin" onclick="unpinMemo(${m.id})" title="ピン解除">✕</button>
+    </div>`).join('');
+    initPinnedDrag();
+  } else {
+    pinnedSection.style.display = 'none';
+    pinnedList.innerHTML = '';
+  }
+
+  // Render memo list
+  if (list.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  let html = list.map(m => {
+    const d = new Date(m.createdAt);
+    const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const pinCls = m.pinned ? ' pinned' : '';
+    return `<div class="memo-item">
+      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
+      <div style="flex:1">
+        <div class="memo-item-text">${escHTML(m.text)}</div>
+      </div>
+      <div class="memo-item-time">${time}</div>
+      <button class="memo-item-del" onclick="deleteMemo(${m.id})">✕</button>
+    </div>`;
+  }).join('');
+
+  html += `<a class="memo-gmail-btn" href="${buildGmailAllUrl()}">✉️ メールで送る</a>`;
+
+  el.innerHTML = html;
+}
+
+// Drag-to-reorder for pinned memos
+let dragSrcId = null;
+
+function initPinnedDrag() {
+  const items = document.querySelectorAll('.pinned-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', handleDragStart);
+    item.addEventListener('dragend', handleDragEnd);
+    item.addEventListener('dragover', handleDragOver);
+    item.addEventListener('dragenter', handleDragEnter);
+    item.addEventListener('dragleave', handleDragLeave);
+    item.addEventListener('drop', handleDrop);
+    // Touch support
+    item.addEventListener('touchstart', handleTouchStart, { passive: false });
+    item.addEventListener('touchmove', handleTouchMove, { passive: false });
+    item.addEventListener('touchend', handleTouchEnd);
+  });
+}
+
+function handleDragStart(e) {
+  if (e.target.isContentEditable) { e.preventDefault(); return; }
+  dragSrcId = Number(this.dataset.id);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over'));
+}
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+function handleDragEnter(e) {
+  e.preventDefault();
+  this.classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetId = Number(this.dataset.id);
+  if (dragSrcId === targetId) return;
+  reorderPinned(dragSrcId, targetId);
+}
+
+// Touch drag support
+let touchDragEl = null;
+let touchClone = null;
+let touchStartY = 0;
+
+function handleTouchStart(e) {
+  if (e.target.closest('.pinned-item-unpin') || e.target.isContentEditable) return;
+  touchDragEl = this;
+  dragSrcId = Number(this.dataset.id);
+  touchStartY = e.touches[0].clientY;
+  this.touchTimer = setTimeout(() => {
+    this.classList.add('dragging');
+    touchClone = this.cloneNode(true);
+    touchClone.style.cssText = 'position:fixed;left:0;right:0;margin:0 20px;opacity:0.8;z-index:9999;pointer-events:none;transform:scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,0.3);';
+    touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
+    document.body.appendChild(touchClone);
+  }, 200);
+}
+function handleTouchMove(e) {
+  if (!touchDragEl) return;
+  if (!touchClone) {
+    if (Math.abs(e.touches[0].clientY - touchStartY) < 10) return;
+    clearTimeout(touchDragEl.touchTimer);
+    touchDragEl = null;
+    return;
+  }
+  e.preventDefault();
+  touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
+  const target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over'));
+  const item = target ? target.closest('.pinned-item') : null;
+  if (item && item !== touchDragEl) item.classList.add('drag-over');
+}
+function handleTouchEnd(e) {
+  clearTimeout(touchDragEl?.touchTimer);
+  if (touchClone) {
+    touchClone.remove();
+    touchClone = null;
+    const touch = e.changedTouches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const item = target ? target.closest('.pinned-item') : null;
+    if (item && Number(item.dataset.id) !== dragSrcId) {
+      reorderPinned(dragSrcId, Number(item.dataset.id));
+    } else {
+      if (touchDragEl) touchDragEl.classList.remove('dragging');
+    }
+  }
+  document.querySelectorAll('.pinned-item').forEach(i => i.classList.remove('drag-over', 'dragging'));
+  touchDragEl = null;
+}
+
+function reorderPinned(srcId, targetId) {
+  const list = getMemos();
+  const pinned = list.filter(m => m.pinned).sort((a, b) => (a.pinOrder || 0) - (b.pinOrder || 0));
+  const srcIdx = pinned.findIndex(m => m.id === srcId);
+  const tgtIdx = pinned.findIndex(m => m.id === targetId);
+  if (srcIdx === -1 || tgtIdx === -1) return;
+  const [moved] = pinned.splice(srcIdx, 1);
+  pinned.splice(tgtIdx, 0, moved);
+  pinned.forEach((m, i) => {
+    const orig = list.find(o => o.id === m.id);
+    if (orig) orig.pinOrder = i;
+  });
+  saveMemos(list);
+  renderMemos();
+}
+
+function buildGmailAllUrl() {
+  const list = getMemos();
+  if (list.length === 0) return '#';
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
+  const subject = encodeURIComponent(`メモ一覧 (${dateStr})`);
+  const lines = list.map(m => {
+    const d = new Date(m.createdAt);
+    const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    return `・${m.text}  (${time})`;
+  });
+  const body = encodeURIComponent(lines.join('\n') + '\n\n— totonoe-jikan');
+  return `mailto:?subject=${subject}&body=${body}`;
+}
+
+renderMemos();
+
+// ════════════════════════════════════════
+//  Pomodoro Timer
+// ════════════════════════════════════════
+const POMO_MODES = {
+  work:  { duration: 25 * 60, label: '集中', cls: 'work' },
+  short: { duration: 5 * 60,  label: '休憩',       cls: 'short' },
+};
+const POMO_CIRCUMFERENCE = 2 * Math.PI * 42; // ~264
+
+let pomoMode = 'work';
+let pomoTimeLeft = POMO_MODES.work.duration;
+let pomoRunning = false;
+let pomoInterval = null;
+let pomoSessions = 0;
+let pomoLog = []; // {startTime, endTime, mode}
+let pomoCurrentStart = null;
+let pomoLastTick = 0;
+
+function savePomoState() {
+  try {
+    localStorage.setItem('aical_pomo_state', JSON.stringify({
+      mode: pomoMode,
+      timeLeft: pomoTimeLeft,
+      running: pomoRunning,
+      savedAt: Date.now(),
+      currentStart: pomoCurrentStart ? pomoCurrentStart.toISOString() : null,
+      sessions: pomoSessions
+    }));
+  } catch(e) {}
+}
+
+function restorePomoState() {
+  try {
+    const data = JSON.parse(localStorage.getItem('aical_pomo_state'));
+    if (!data) return;
+    pomoMode = data.mode || 'work';
+
+    // Only restore sessions if saved today, otherwise use ganttLoad's count
+    if (data.savedAt && new Date(data.savedAt).toDateString() === new Date().toDateString()) {
+      pomoSessions = data.sessions || 0;
+    }
+
+    if (data.currentStart) pomoCurrentStart = new Date(data.currentStart);
+
+    if (data.running && data.savedAt) {
+      const elapsed = Math.floor((Date.now() - data.savedAt) / 1000);
+      pomoTimeLeft = Math.max(0, data.timeLeft - elapsed);
+      if (pomoTimeLeft <= 0) {
+        // Timer would have completed during reload
+        pomoTimeLeft = 0;
+        pomoUpdateDisplay();
+        pomoComplete();
+        return;
+      }
+      // Resume running
+      pomoUpdateModeButtons();
+      pomoUpdateDisplay();
+      pomoRestoring = true;
+      pomoStart();
+      pomoRestoring = false;
+      // Rain can't autoplay without user gesture - queue it
+      if (pomoMode === 'work') {
+        rainPendingResume = true;
+        setupAudioResume();
+      }
+    } else {
+      pomoTimeLeft = data.timeLeft || POMO_MODES[pomoMode].duration;
+      pomoUpdateModeButtons();
+      pomoUpdateDisplay();
+    }
+  } catch(e) {}
+}
+
+const GANTT_START = 4; // 4:00
+const GANTT_END = 19;  // 19:00
+const GANTT_TOTAL_MIN = (GANTT_END - GANTT_START) * 60;
+
+function pomoSetMode(mode) {
+  if (pomoRunning) return;
+  pomoMode = mode;
+  pomoTimeLeft = POMO_MODES[mode].duration;
+  pomoUpdateDisplay();
+  pomoUpdateModeButtons();
+  savePomoState();
+}
+
+function pomoUpdateModeButtons() {
+  document.getElementById('pomoModeWork').className = 'pomo-mode-btn' + (pomoMode === 'work' ? ' active-work' : '');
+  document.getElementById('pomoModeShort').className = 'pomo-mode-btn' + (pomoMode === 'short' ? ' active-short' : '');
+  document.getElementById('pomoModeLabel').textContent = pomoMode === 'work' ? '✍️' : '☕';
+}
+
+function pomoUpdateDisplay() {
+  const m = Math.floor(pomoTimeLeft / 60);
+  const s = pomoTimeLeft % 60;
+  document.getElementById('pomoTimeText').textContent =
+    String(m) + ':' + String(s).padStart(2, '0');
+
+  const total = POMO_MODES[pomoMode].duration;
+  const remaining = pomoTimeLeft / total;
+  const offset = POMO_CIRCUMFERENCE * (1 - remaining);
+  const ring = document.getElementById('pomoRing');
+  ring.style.strokeDashoffset = offset;
+  ring.className.baseVal = 'pomo-ring-progress ' + POMO_MODES[pomoMode].cls;
+
+  document.getElementById('pomoSessionCount').textContent = pomoSessions;
+}
+
+function pomoToggle() {
+  if (pomoRunning) {
+    pomoPause();
+  } else {
+    pomoStart();
+  }
+}
+
+function pomoStart() {
+  // Clear any existing interval first
+  if (pomoInterval) {
+    clearInterval(pomoInterval);
+    pomoInterval = null;
+  }
+
+  pomoRunning = true;
+  try { ensureAudioCtx(); ensureAlarmCtx(); } catch(e) {}
+  if (!pomoCurrentStart) pomoCurrentStart = new Date();
+  pomoLastTick = Date.now();
+  document.getElementById('pomoStartBtn').innerHTML = '⏸';
+  document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-pause';
+  if (pomoMode === 'work') startRain(); else stopRain();
+  pomoUpdateModeButtons();
+  pomoUpdateDisplay();
+  savePomoState();
+
+  pomoInterval = setInterval(() => {
+    const now = Date.now();
+    const gap = now - pomoLastTick;
+    pomoLastTick = now;
+
+    // Sleep detection: gap > 3s means phone slept
+    if (gap > 3000) {
+      const sleepStart = new Date(now - gap);
+      // Log the pre-sleep portion
+      if (pomoCurrentStart) {
+        const elapsed = (sleepStart - pomoCurrentStart) / 1000;
+        if (elapsed >= 60) {
+          pomoLog.push({
+            startTime: pomoCurrentStart,
+            endTime: sleepStart,
+            mode: pomoMode,
+          });
+          ganttSave();
+        }
+      }
+
+      // Check if timer should have completed during sleep
+      const realElapsed = Math.round((now - pomoCurrentStart.getTime()) / 1000);
+      const totalDuration = POMO_MODES[pomoMode].duration;
+      if (realElapsed >= totalDuration) {
+        pomoTimeLeft = 0;
+        pomoCurrentStart = null;
+        pomoUpdateDisplay();
+        pomoComplete();
+        return;
+      }
+
+      // Still time left: adjust and start new segment from now
+      pomoTimeLeft = totalDuration - realElapsed;
+      pomoCurrentStart = new Date();
+    } else {
+      pomoTimeLeft--;
+    }
+
+    if (pomoTimeLeft <= 0) {
+      pomoTimeLeft = 0;
+      pomoUpdateDisplay();
+      pomoComplete();
+      return;
+    }
+    if (pomoTimeLeft <= 3 && !pomoCountdownScheduled) scheduleCountdown(pomoTimeLeft);
+    pomoUpdateDisplay();
+    ganttRender();
+    savePomoState();
+  }, 1000);
+}
+
+function pomoPause() {
+  pomoRunning = false;
+  clearInterval(pomoInterval);
+  stopRain();
+  // Log session up to this point
+  if (pomoCurrentStart) {
+    const elapsed = POMO_MODES[pomoMode].duration - pomoTimeLeft;
+    if (elapsed >= 60) {
+      pomoLog.push({
+        startTime: pomoCurrentStart,
+        endTime: new Date(),
+        mode: pomoMode,
+      });
+      ganttSave();
+      pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
+    }
+    pomoCurrentStart = null;
+  }
+  document.getElementById('pomoStartBtn').innerHTML = '▶';
+  document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-start';
+  ganttRender();
+  savePomoState();
+}
+
+function pomoReset() {
+  pomoRunning = false;
+  pomoCountdownScheduled = false;
+  clearInterval(pomoInterval);
+  stopRain();
+  // Log partial session
+  if (pomoCurrentStart) {
+    const elapsed = POMO_MODES[pomoMode].duration - pomoTimeLeft;
+    if (elapsed >= 60) {
+      pomoLog.push({
+        startTime: pomoCurrentStart,
+        endTime: new Date(),
+        mode: pomoMode,
+      });
+      ganttSave();
+      pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
+    }
+    pomoCurrentStart = null;
+  }
+  pomoTimeLeft = POMO_MODES[pomoMode].duration;
+  document.getElementById('pomoStartBtn').innerHTML = '▶';
+  document.getElementById('pomoStartBtn').className = 'pomo-btn pomo-btn-start';
+  pomoUpdateDisplay();
+  ganttRender();
+  savePomoState();
+}
+
+function pomoComplete() {
+  clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoRunning = false;
+  pomoCountdownScheduled = false;
+  stopRain();
+
+  const prevMode = pomoMode;
+
+  // Log session
+  const completedAt = new Date();
+  try {
+    if (pomoCurrentStart) {
+      pomoLog.push({
+        startTime: pomoCurrentStart,
+        endTime: completedAt,
+        mode: prevMode,
+      });
+      pomoCurrentStart = null;
+      ganttSave();
+    }
+  } catch(e) { console.warn('Log error:', e); }
+
+  pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
+
+  // Notification
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const msg = prevMode === 'work'
+        ? workLabel() + 'タイム終了！休憩しましょう 🎉'
+        : '休憩終了！' + workLabel() + 'タイムに戻りましょう 💪';
+      new Notification('🍅 ポモドーロ', {
+        body: msg,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>',
+      });
+    }
+  } catch(e) { console.warn('Notification error:', e); }
+
+  // Resume audio contexts (kept alive by silent oscillators)
+  try {
+    if (rainCtx && rainCtx.state === 'suspended') rainCtx.resume();
+    if (alarmCtx && alarmCtx.state === 'suspended') alarmCtx.resume();
+  } catch(e) {}
+
+  try {
+    // Countdown chime already scheduled by scheduleCountdown
+  } catch(e) { console.warn('Sound error:', e); }
+
+  // Switch to next mode and auto-start via setTimeout to break call chain
+  const nextMode = prevMode === 'work' ? 'short' : 'work';
+  pomoMode = nextMode;
+  pomoTimeLeft = POMO_MODES[nextMode].duration;
+  pomoCurrentStart = completedAt;
+  pomoUpdateModeButtons();
+  pomoUpdateDisplay();
+  ganttRender();
+
+  setTimeout(() => {
+    try {
+      pomoStart();
+    } catch(e) {
+      console.warn('Auto-start error:', e);
+    }
+  }, 100);
+}
+
+// ════════════════════════════════════════
+//  Gantt Chart
+// ════════════════════════════════════════
+function ganttTimeToPercent(date) {
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const totalMin = (h - GANTT_START) * 60 + m;
+  return Math.max(0, Math.min(100, (totalMin / GANTT_TOTAL_MIN) * 100));
+}
+
+function ganttRender() {
+  const bar = document.getElementById('pomoGanttBar');
+  bar.querySelectorAll('.pomo-gantt-block, .pomo-gantt-event').forEach(el => el.remove());
+
+  const today = new Date();
+  const todayStr = today.toDateString();
+
+  // Render calendar events from history
+  const history = getHistory();
+  history.forEach(entry => {
+    if (entry.allDay) return;
+    const start = safeParseDate(entry.startDate);
+    const end = safeParseDate(entry.endDate);
+    if (start.toDateString() !== todayStr) return;
+
+    const left = ganttTimeToPercent(start);
+    const right = ganttTimeToPercent(end);
+    const width = right - left;
+    if (width <= 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'pomo-gantt-event';
+    block.style.left = left + '%';
+    block.style.width = width + '%';
+
+    if (width > 3) {
+      const label = document.createElement('div');
+      label.className = 'pomo-gantt-event-label';
+      label.textContent = entry.title;
+      block.appendChild(label);
+    }
+    bar.appendChild(block);
+  });
+
+  // Render pomo sessions
+  const todayLogs = pomoLog.filter(l => l.startTime.toDateString() === todayStr);
+
+  todayLogs.forEach(log => {
+    const left = ganttTimeToPercent(log.startTime);
+    const right = ganttTimeToPercent(log.endTime);
+    const width = right - left;
+    if (width <= 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'pomo-gantt-block ' + POMO_MODES[log.mode].cls;
+    block.style.left = left + '%';
+    block.style.width = width + '%';
+
+    bar.appendChild(block);
+  });
+
+  // Active session
+  if (pomoCurrentStart && pomoRunning) {
+    const left = ganttTimeToPercent(pomoCurrentStart);
+    const right = ganttTimeToPercent(new Date());
+    const width = Math.max(0.5, right - left);
+
+    const block = document.createElement('div');
+    block.className = 'pomo-gantt-block ' + POMO_MODES[pomoMode].cls;
+    block.style.left = left + '%';
+    block.style.width = width + '%';
+    block.style.opacity = '1';
+    block.style.animation = 'pulseRing 2s ease-in-out infinite';
+    bar.appendChild(block);
+  }
+
+  // Now indicator
+  const nowEl = document.getElementById('pomoGanttNow');
+  const nowPct = ganttTimeToPercent(new Date());
+  nowEl.style.left = nowPct + '%';
+  nowEl.style.display = (nowPct > 0 && nowPct < 100) ? 'block' : 'none';
+
+  ganttUpdateSummary(todayLogs);
+}
+
+function ganttUpdateSummary(logs) {
+  let workMin = 0, breakMin = 0;
+  logs.forEach(l => {
+    const dur = (l.endTime - l.startTime) / 60000;
+    if (l.mode === 'work') workMin += dur;
+    else breakMin += dur;
+  });
+  if (pomoCurrentStart && pomoRunning) {
+    const dur = (new Date() - pomoCurrentStart) / 60000;
+    if (pomoMode === 'work') workMin += dur;
+    else breakMin += dur;
+  }
+
+  document.getElementById('pomoGanttSummary').innerHTML = `
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-work)"></div> ${workLabel()} ${Math.round(workMin)}分</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-break)"></div> 休憩 ${Math.round(breakMin)}分</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:rgba(255,179,71,0.5);border:1px solid rgba(255,179,71,0.7)"></div> 予定</div>
+  `;
+}
+
+function ganttInitTicks() {
+  const el = document.getElementById('pomoGanttTicks');
+  let html = '';
+  for (let h = GANTT_START; h <= GANTT_END; h++) {
+    html += `<span class="pomo-gantt-tick">${h}</span>`;
+  }
+  el.innerHTML = html;
+}
+
+function ganttSave() {
+  try {
+    // Merge today's log with stored recent logs, then prune >7 days
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const stored = JSON.parse(localStorage.getItem('aical_pomo_log') || '[]')
+      .filter(d => d.s > cutoff);
+    const todayStr = new Date().toDateString();
+    // Remove today's old entries from stored, replace with current pomoLog
+    const kept = stored.filter(d => new Date(d.s).toDateString() !== todayStr);
+    const todayData = pomoLog.map(l => ({ s: l.startTime.getTime(), e: l.endTime.getTime(), m: l.mode }));
+    localStorage.setItem('aical_pomo_log', JSON.stringify([...kept, ...todayData]));
+  } catch(e) {}
+}
+
+function ganttLoad() {
+  try {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const data = JSON.parse(localStorage.getItem('aical_pomo_log') || '[]')
+      .filter(d => d.s > cutoff);
+    // Save pruned data back
+    localStorage.setItem('aical_pomo_log', JSON.stringify(data));
+    const today = new Date().toDateString();
+    pomoLog = data
+      .map(d => ({ startTime: new Date(d.s), endTime: new Date(d.e), mode: d.m }))
+      .filter(l => l.startTime.toDateString() === today);
+    pomoSessions = pomoLog.filter(l => l.mode === 'work').length;
+  } catch(e) { pomoLog = []; }
+}
+
+ganttLoad();
+ganttInitTicks();
+ganttRender();
+restoreAmbient();
+restorePomoState();
+pomoUpdateDisplay();
+
+// Save state when leaving page
+window.addEventListener('beforeunload', savePomoState);
+
+// Track current day for reset detection
+let lastKnownDate = new Date().toDateString();
+
+function checkDayChange() {
+  const today = new Date().toDateString();
+  if (today !== lastKnownDate) {
+    lastKnownDate = today;
+    ganttLoad();
+    ganttRender();
+  }
+}
+
+// Detect wake from sleep via visibility change
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    checkDayChange();
+    if (pomoRunning) {
+      pomoLastTick = Date.now();
+      ganttRender();
+    }
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') savePomoState();
+});
+
+// Update now-line every minute + check day change
+setInterval(() => { checkDayChange(); if (!pomoRunning) ganttRender(); }, 60000);
+
+// ════════════════════════════════════════
+//  Theme
+// ════════════════════════════════════════
+function isKonmari() {
+  return document.documentElement.getAttribute('data-theme') === 'konmari-beige';
+}
+function workLabel() { return '集中'; }
+
+function setTheme(theme) {
+  if (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  try { localStorage.setItem('aical_theme', theme); } catch(e) {}
+  updateThemeLabels();
+}
+
+function updateThemeLabels() {
+  const wl = workLabel();
+  const memoTitle = isKonmari() ? '📝 ときめきメモ' : '📝 ひとことメモ';
+  const workBtn = document.getElementById('pomoModeWork');
+  if (workBtn) workBtn.textContent = wl + ' 25分';
+  const memoEl = document.querySelector('.memo-title');
+  if (memoEl) memoEl.textContent = memoTitle;
+  const sparkEl = document.getElementById('pomoSparkJoy');
+  if (sparkEl) {
+    if (isKonmari()) {
+      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
+    } else {
+      sparkEl.innerHTML = '<span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie？</span>';
+    }
+  }
+}
+
+(function loadTheme() {
+  try {
+    const saved = localStorage.getItem('aical_theme');
+    setTheme(saved !== null ? saved : 'konmari-beige');
+  } catch(e) { setTheme('konmari-beige'); }
+})();
+
+// ════════════════════════════════════════
+//  Service Worker (PWA)
+// ════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js?v=2026.5.23-09.57').catch(() => {});
+}
+// ════════════════════════════════════════
+//  Screen Lock (pocket mode)
+// ════════════════════════════════════════
+let screenLocked = false;
+let lockHoldTimer = null;
+let lockHoldStart = 0;
+const LOCK_HOLD_DURATION = 1500; // 1.5s to unlock
+
+function lockScreen() {
+  screenLocked = true;
+  const overlay = document.getElementById('lockOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('lockProgress').innerHTML = '<div class="lock-progress-bar" id="lockProgressBar"></div>';
+
+  // Prevent scrolling
+  document.body.style.overflow = 'hidden';
+
+  overlay.addEventListener('touchstart', lockHoldStart_handler, { passive: false });
+  overlay.addEventListener('touchend', lockHoldEnd_handler);
+  overlay.addEventListener('touchmove', lockPreventDefault, { passive: false });
+  overlay.addEventListener('mousedown', lockHoldStart_handler);
+  overlay.addEventListener('mouseup', lockHoldEnd_handler);
+}
+
+function lockPreventDefault(e) { e.preventDefault(); }
+
+function lockHoldStart_handler(e) {
+  e.preventDefault();
+  lockHoldStart = Date.now();
+  const bar = document.getElementById('lockProgressBar');
+  if (bar) bar.style.width = '0%';
+
+  lockHoldTimer = setInterval(() => {
+    const elapsed = Date.now() - lockHoldStart;
+    const pct = Math.min(100, (elapsed / LOCK_HOLD_DURATION) * 100);
+    const bar = document.getElementById('lockProgressBar');
+    if (bar) bar.style.width = pct + '%';
+
+    if (elapsed >= LOCK_HOLD_DURATION) {
+      clearInterval(lockHoldTimer);
+      lockHoldTimer = null;
+      unlockScreen();
+    }
+  }, 30);
+}
+
+function lockHoldEnd_handler() {
+  if (lockHoldTimer) {
+    clearInterval(lockHoldTimer);
+    lockHoldTimer = null;
+  }
+  const bar = document.getElementById('lockProgressBar');
+  if (bar) bar.style.width = '0%';
+}
+
+function unlockScreen() {
+  screenLocked = false;
+  const overlay = document.getElementById('lockOverlay');
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+
+  overlay.removeEventListener('touchstart', lockHoldStart_handler);
+  overlay.removeEventListener('touchend', lockHoldEnd_handler);
+  overlay.removeEventListener('touchmove', lockPreventDefault);
+  overlay.removeEventListener('mousedown', lockHoldStart_handler);
+  overlay.removeEventListener('mouseup', lockHoldEnd_handler);
+}
+
+</script>
+  <div id="toastMsg" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;display:none;z-index:9999"></div>
+</body>
+</html>
