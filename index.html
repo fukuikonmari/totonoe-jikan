@@ -201,6 +201,20 @@
     opacity: 0.4;
     padding: 4px 8px;
   }
+  .lang-btn {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0.45;
+    padding: 4px 8px;
+    color: var(--text-dim);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
   .lock-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -1585,17 +1599,18 @@
 
   <!-- Header -->
   <div class="header">
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">🌐 EN</button>
     <div class="logo">
       <div class="logo-icon">⌚</div>
-      <span class="logo-text">totonoe-jikan</span>
+      <span class="logo-text">ReDesign your Life</span>
     </div>
-    <button class="lock-btn" onclick="lockScreen()" title="画面ロック">🔒</button>
+    <button class="lock-btn" onclick="lockScreen()" title="画面ロック" data-i18n-title="lockBtnTitle">🔒</button>
   </div>
 
   <!-- Screen Lock Overlay -->
   <div class="lock-overlay" id="lockOverlay" style="display:none">
     <div class="lock-icon">🔒</div>
-    <div class="lock-msg">長押しで解除</div>
+    <div class="lock-msg" data-i18n="lockMsg">長押しで解除</div>
     <div class="lock-progress" id="lockProgress"></div>
   </div>
 
@@ -1605,7 +1620,7 @@
     <div class="pinned-section" id="pinnedSection" style="display:none">
       <div class="pinned-card">
         <div class="pinned-header">
-          <span class="pinned-title">📌 ワクワクリスト</span>
+          <span class="pinned-title" data-i18n="pinnedTitle">📌 ワクワクリスト</span>
         </div>
         <div class="pinned-list" id="pinnedList"></div>
       </div>
@@ -1614,15 +1629,15 @@
     <div class="pomo-section">
       <div class="pomo-card">
         <div class="pomo-header">
-          <span class="pomo-title">🍅 ポモドーロタイマー</span>
-          <button class="notif-help-btn" style="display:none;margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()">🔊 音テスト</button>
+          <span class="pomo-title" data-i18n="pomoTitle">🍅 ポモドーロタイマー</span>
+          <button class="notif-help-btn" style="display:none;margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="audioDiag()" data-i18n="soundTest">🔊 音テスト</button>
           <div id="audioDiagResult" style="display:none;font-size:10px;padding:4px 8px;border-radius:6px;margin-top:4px;width:100%;text-align:left;font-family:monospace"></div>
           <button class="notif-help-btn" id="tickMuteBtn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="cycleAmbient()">🌧 雨音</button>
         </div>
         <div class="pomo-main">
           <div class="pomo-modes-top">
-            <button class="pomo-mode-btn active-work" id="pomoModeWork" onclick="pomoSetMode('work')">集中 25分</button>
-            <button class="pomo-mode-btn" id="pomoModeShort" onclick="pomoSetMode('short')">休憩 5分</button>
+            <button class="pomo-mode-btn active-work" id="pomoModeWork" onclick="pomoSetMode('work')" data-i18n="pomoModeWork">集中 25分</button>
+            <button class="pomo-mode-btn" id="pomoModeShort" onclick="pomoSetMode('short')" data-i18n="pomoModeShort">休憩 5分</button>
           </div>
           <div class="pomo-display">
             <svg class="pomo-ring" viewBox="0 0 100 100">
@@ -1659,9 +1674,9 @@
               </g>
             </svg>
             <div class="pomo-time-inner">
-              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie？</span></div>
+              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span></div>
               <div class="pomo-time-text" id="pomoTimeText">25:00</div>
-              <div class="pomo-mode-label" id="pomoModeLabel">集中</div>
+              <div class="pomo-mode-label" id="pomoModeLabel" data-i18n="pomoModeLabelText">集中</div>
             </div>
           </div>
           <div class="pomo-controls-bottom">
@@ -1669,9 +1684,9 @@
             <button class="pomo-btn pomo-btn-reset" onclick="pomoReset()" style="font-size:20px">↺</button>
           </div>
         </div>
-        <div class="pomo-count">完了セッション: <span id="pomoSessionCount">0</span></div>
+        <div class="pomo-count"><span data-i18n="pomoCount">完了セッション: </span><span id="pomoSessionCount">0</span></div>
         <div class="pomo-gantt">
-          <div class="pomo-gantt-label">📊 今日のタイムライン</div>
+          <div class="pomo-gantt-label" data-i18n="ganttLabel">📊 今日のタイムライン</div>
           <div class="pomo-gantt-bar-wrap" id="pomoGanttBar">
             <div class="pomo-gantt-now" id="pomoGanttNow"></div>
           </div>
@@ -1688,8 +1703,8 @@
           <span class="memo-title">📝 ひとことメモ</span>
         </div>
         <div class="memo-input-row">
-          <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
-          <button class="memo-add-btn" onclick="addMemo()">追加</button>
+          <input class="memo-input" id="memoInput" type="text" size="1" placeholder="メモを入力..." data-i18n-placeholder="memoInputPlaceholder" maxlength="200" onkeydown="if(event.key==='Enter')addMemo()">
+          <button class="memo-add-btn" onclick="addMemo()" data-i18n="memoAdd">追加</button>
           <button class="memo-add-btn memo-pin-btn" onclick="addWaku()">📌</button>
         </div>
         <div class="memo-list" id="memoList"></div>
@@ -1706,11 +1721,11 @@
       </div>
       <button class="btn-alarm-only" id="alarmOnlyBtn" onclick="parseAndAlarmOnly()" disabled style="margin-bottom:8px">
         <span style="font-size:18px">🔔</span>
-        アラーム
+        <span data-i18n="alarmBtn">アラーム</span>
       </button>
       <button class="btn-primary" id="parseBtn" onclick="parseInput()" disabled>
         <span style="font-size:20px">📅</span>
-        カレンダーに登録
+        <span data-i18n="parseBtn">カレンダーに登録</span>
       </button>
       <div class="error-msg" id="errorMsg" style="display:none"></div>
     </div>
@@ -1718,7 +1733,7 @@
     <!-- History list -->
     <div class="history-section" id="historySection" style="display:none">
       <div class="history-header">
-        <span class="history-title">📋 予定</span>
+        <span class="history-title" data-i18n="historyTitle">📋 予定</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="history-count" id="historyCount"></span>
         </div>
@@ -1734,7 +1749,7 @@
         <div class="result-icon">✅</div>
         <div>
           <div class="result-title" id="resTitle"></div>
-          <span class="result-badge">解析完了</span>
+          <span class="result-badge" data-i18n="resultBadge">解析完了</span>
         </div>
       </div>
 
@@ -1742,13 +1757,13 @@
 
       <!-- Reminder section -->
       <div class="reminder-section">
-        <div class="reminder-label">🔔 リマインド通知 <button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="openNotifHelp()">通知設定 ?</button></div>
+        <div class="reminder-label"><span data-i18n="reminderLabel">🔔 リマインド通知 </span><button class="notif-help-btn" style="margin:0;padding:3px 8px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-color:var(--border)" onclick="openNotifHelp()" data-i18n="notifSettingsBtn">通知設定 ?</button></div>
         <div class="reminder-options">
-          <div class="reminder-chip" onclick="setReminder(0)" data-min="0">開始時</div>
-          <div class="reminder-chip" onclick="setReminder(5)" data-min="5">5分前</div>
-          <div class="reminder-chip" onclick="setReminder(10)" data-min="10">10分前</div>
-          <div class="reminder-chip" onclick="setReminder(15)" data-min="15">15分前</div>
-          <div class="reminder-chip" onclick="setReminder(30)" data-min="30">30分前</div>
+          <div class="reminder-chip" onclick="setReminder(0)" data-min="0" data-i18n="reminderChip0">開始時</div>
+          <div class="reminder-chip" onclick="setReminder(5)" data-min="5" data-i18n="reminderChip5">5分前</div>
+          <div class="reminder-chip" onclick="setReminder(10)" data-min="10" data-i18n="reminderChip10">10分前</div>
+          <div class="reminder-chip" onclick="setReminder(15)" data-min="15" data-i18n="reminderChip15">15分前</div>
+          <div class="reminder-chip" onclick="setReminder(30)" data-min="30" data-i18n="reminderChip30">30分前</div>
         </div>
         <div id="reminderStatus"></div>
       </div>
@@ -1756,39 +1771,39 @@
       <!-- Edit section -->
       <div class="edit-section" id="editSection">
         <div class="edit-field">
-          <label>タイトル</label>
+          <label data-i18n="editLabelTitle">タイトル</label>
           <input type="text" id="editTitle">
         </div>
         <div class="edit-field">
-          <label>開始日時</label>
+          <label data-i18n="editLabelStart">開始日時</label>
           <input type="datetime-local" id="editStart">
         </div>
         <div class="edit-field">
-          <label>終了日時</label>
+          <label data-i18n="editLabelEnd">終了日時</label>
           <input type="datetime-local" id="editEnd">
         </div>
         <div class="edit-field">
-          <label>場所</label>
-          <input type="text" id="editLocation" placeholder="（任意）">
+          <label data-i18n="editLabelLocation">場所</label>
+          <input type="text" id="editLocation" placeholder="（任意）" data-i18n-placeholder="optionalPlaceholder">
         </div>
         <div class="edit-field">
-          <label>メモ</label>
-          <input type="text" id="editDescription" placeholder="（任意）">
+          <label data-i18n="editLabelMemo">メモ</label>
+          <input type="text" id="editDescription" placeholder="（任意）" data-i18n-placeholder="optionalPlaceholder">
         </div>
       </div>
 
       <div style="padding:0 28px 8px;display:flex;justify-content:flex-end">
-        <button class="edit-toggle" id="editToggle" onclick="toggleEdit()">✏️ 内容を編集</button>
+        <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" data-i18n="editToggleClosed">✏️ 内容を編集</button>
       </div>
 
       <div class="result-actions">
         <button class="btn-alarm-only" onclick="alarmOnly()">
           <span style="font-size:18px">🔔</span>
-          アラーム
+          <span data-i18n="alarmBtn">アラーム</span>
         </button>
         <button class="btn-gcal" onclick="openGoogleCalendar()">
           <span style="font-size:18px">📅</span>
-          Googleカレンダーに追加
+          <span data-i18n="gcalBtn">Googleカレンダーに追加</span>
         </button>
         <button class="btn-ics" onclick="downloadICS()">
           <span style="font-size:16px">⬇</span>
@@ -1796,72 +1811,72 @@
         </button>
       </div>
     </div>
-    <button class="btn-back" onclick="goBack()">← 入力に戻る</button>
+    <button class="btn-back" onclick="goBack()" data-i18n="backBtn">← 入力に戻る</button>
   </div>
 
   <!-- Theme Picker -->
   <div class="theme-picker">
     
     <div class="theme-picker-btns">
-      <button class="theme-btn active" data-theme="konmari-beige" onclick="setTheme('konmari-beige')" title="ときめき">
+      <button class="theme-btn active" data-theme="konmari-beige" onclick="setTheme('konmari-beige')" title="ときめき" data-i18n-title="themeKonmari">
         <span class="theme-swatch" style="background:#EDE6D8;border-color:#A89078"></span>
       </button>
-      <button class="theme-btn" data-theme="pastel-pink" onclick="setTheme('pastel-pink')" title="ピンク">
+      <button class="theme-btn" data-theme="pastel-pink" onclick="setTheme('pastel-pink')" title="ピンク" data-i18n-title="themePink">
         <span class="theme-swatch" style="background:#FFF0F3;border-color:#F472B6"></span>
       </button>
-      <button class="theme-btn" data-theme="pastel-mint" onclick="setTheme('pastel-mint')" title="ミント">
+      <button class="theme-btn" data-theme="pastel-mint" onclick="setTheme('pastel-mint')" title="ミント" data-i18n-title="themeMint">
         <span class="theme-swatch" style="background:#ECFDF5;border-color:#34D399"></span>
       </button>
-      <button class="theme-btn" data-theme="pastel-lavender" onclick="setTheme('pastel-lavender')" title="ラベンダー">
+      <button class="theme-btn" data-theme="pastel-lavender" onclick="setTheme('pastel-lavender')" title="ラベンダー" data-i18n-title="themeLavender">
         <span class="theme-swatch" style="background:#F3F0FF;border-color:#8B5CF6"></span>
       </button>
-      <button class="theme-btn" data-theme="pastel-sky" onclick="setTheme('pastel-sky')" title="スカイ">
+      <button class="theme-btn" data-theme="pastel-sky" onclick="setTheme('pastel-sky')" title="スカイ" data-i18n-title="themeSky">
         <span class="theme-swatch" style="background:#EFF6FF;border-color:#3B82F6"></span>
       </button>
-      <button class="theme-btn" data-theme="pastel-peach" onclick="setTheme('pastel-peach')" title="ピーチ">
+      <button class="theme-btn" data-theme="pastel-peach" onclick="setTheme('pastel-peach')" title="ピーチ" data-i18n-title="themePeach">
         <span class="theme-swatch" style="background:#FFF7ED;border-color:#F97316"></span>
       </button>
-      <button class="theme-btn" data-theme="" onclick="setTheme('')" title="ダーク">
+      <button class="theme-btn" data-theme="" onclick="setTheme('')" title="ダーク" data-i18n-title="themeDark">
         <span class="theme-swatch" style="background:#0A0E1A;border-color:#3B82F6"></span>
       </button>
     </div>
   </div>
 
-  <div class="footer">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
-  <div class="footer" style="margin-top:4px">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.3.17-05.23</div>
+  <div class="footer" data-i18n="footer1">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
+  <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.24-21.45</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
     <div class="notif-help-content" onclick="event.stopPropagation()">
-      <h3>🔔 通知の許可方法</h3>
+      <h3 data-i18n="notifH3">🔔 通知の許可方法</h3>
       <div class="browser-section">
-        <div class="browser-name">Chrome（PC）</div>
-        <div class="browser-steps">
+        <div class="browser-name" data-i18n="browserChromePc">Chrome（PC）</div>
+        <div class="browser-steps" data-i18n-html="notifStepsChromePc">
           <span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br>
           <span class="step-num">2</span>「通知」を「許可」に変更<br>
           <span class="step-num">3</span>ページを再読み込み
         </div>
       </div>
       <div class="browser-section">
-        <div class="browser-name">Chrome（スマホ）</div>
-        <div class="browser-steps">
+        <div class="browser-name" data-i18n="browserChromeMobile">Chrome（スマホ）</div>
+        <div class="browser-steps" data-i18n-html="notifStepsChromeMobile">
           <span class="step-num">1</span>アドレスバー右の ⋮ → 「サイトの設定」<br>
           <span class="step-num">2</span>「通知」を「許可」に変更<br>
           <span class="step-num">3</span>ページを再読み込み
         </div>
       </div>
       <div class="browser-section">
-        <div class="browser-name">Safari（Mac）</div>
-        <div class="browser-steps">
+        <div class="browser-name" data-i18n="browserSafariMac">Safari（Mac）</div>
+        <div class="browser-steps" data-i18n-html="notifStepsSafariMac">
           <span class="step-num">1</span>Safari → 設定 → Webサイト → 通知<br>
           <span class="step-num">2</span>このサイトを「許可」に変更<br>
           <span class="step-num">3</span>ページを再読み込み
         </div>
       </div>
       <div class="browser-section">
-        <div class="browser-name">Safari（iPhone）</div>
-        <div class="browser-steps">
+        <div class="browser-name" data-i18n="browserSafariIphone">Safari（iPhone）</div>
+        <div class="browser-steps" data-i18n-html="notifStepsSafariIphone">
           <span class="step-num">1</span>このページを「ホーム画面に追加」<br>
           <span class="step-num">2</span>ホーム画面から開き直す<br>
           <span class="step-num">3</span>通知の許可ダイアログで「許可」をタップ
@@ -1869,13 +1884,13 @@
       </div>
       <div class="browser-section">
         <div class="browser-name">Edge / Firefox</div>
-        <div class="browser-steps">
+        <div class="browser-steps" data-i18n-html="notifStepsEdge">
           <span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br>
           <span class="step-num">2</span>「通知」の権限を「許可」に変更<br>
           <span class="step-num">3</span>ページを再読み込み
         </div>
       </div>
-      <button class="notif-help-close" onclick="document.getElementById('notifHelpModal').style.display='none'">閉じる</button>
+      <button class="notif-help-close" onclick="document.getElementById('notifHelpModal').style.display='none'" data-i18n="notifClose">閉じる</button>
     </div>
   </div>
 </div>
@@ -1887,6 +1902,270 @@
 let currentEvent = null;
 let editOpen = false;
 let activeReminders = []; // {timerId, minBefore, fireTime, eventId}
+
+// ════════════════════════════════════════
+//  i18n  (language switching: ja / en)
+// ════════════════════════════════════════
+const I18N = {
+  ja: {
+    docTitle: 'ととのえ時間−今日が成長＆ときめきの１日になりますように',
+    lockBtnTitle: '画面ロック',
+    lockMsg: '長押しで解除',
+    pinnedTitle: '📌 ワクワクリスト',
+    pomoTitle: '🍅 ポモドーロタイマー',
+    soundTest: '🔊 音テスト',
+    pomoModeWork: '集中 25分',
+    pomoModeShort: '休憩 5分',
+    pomoModeLabelText: '集中',
+    pomoCount: '完了セッション: ',
+    ganttLabel: '📊 今日のタイムライン',
+    memoAdd: '追加',
+    memoInputPlaceholder: 'メモを入力...',
+    alarmBtn: 'アラーム',
+    parseBtn: 'カレンダーに登録',
+    historyTitle: '📋 予定',
+    resultBadge: '解析完了',
+    reminderLabel: '🔔 リマインド通知 ',
+    notifSettingsBtn: '通知設定 ?',
+    reminderChip0: '開始時',
+    reminderChip5: '5分前',
+    reminderChip10: '10分前',
+    reminderChip15: '15分前',
+    reminderChip30: '30分前',
+    editLabelTitle: 'タイトル',
+    editLabelStart: '開始日時',
+    editLabelEnd: '終了日時',
+    editLabelLocation: '場所',
+    editLabelMemo: 'メモ',
+    optionalPlaceholder: '（任意）',
+    editToggleClosed: '✏️ 内容を編集',
+    editToggleOpen: '▲ 編集を閉じる',
+    gcalBtn: 'Googleカレンダーに追加',
+    backBtn: '← 入力に戻る',
+    themeKonmari: 'ときめき', themePink: 'ピンク', themeMint: 'ミント',
+    themeLavender: 'ラベンダー', themeSky: 'スカイ', themePeach: 'ピーチ', themeDark: 'ダーク',
+    footer1: 'totonoe-jikan ブラウザ完結　アカウント登録不要',
+    footer2: '制作：fukui.konmari',
+    notifH3: '🔔 通知の許可方法',
+    browserChromePc: 'Chrome（PC）',
+    browserChromeMobile: 'Chrome（スマホ）',
+    browserSafariMac: 'Safari（Mac）',
+    browserSafariIphone: 'Safari（iPhone）',
+    notifStepsChromePc: '<span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br><span class="step-num">2</span>「通知」を「許可」に変更<br><span class="step-num">3</span>ページを再読み込み',
+    notifStepsChromeMobile: '<span class="step-num">1</span>アドレスバー右の ⋮ → 「サイトの設定」<br><span class="step-num">2</span>「通知」を「許可」に変更<br><span class="step-num">3</span>ページを再読み込み',
+    notifStepsSafariMac: '<span class="step-num">1</span>Safari → 設定 → Webサイト → 通知<br><span class="step-num">2</span>このサイトを「許可」に変更<br><span class="step-num">3</span>ページを再読み込み',
+    notifStepsSafariIphone: '<span class="step-num">1</span>このページを「ホーム画面に追加」<br><span class="step-num">2</span>ホーム画面から開き直す<br><span class="step-num">3</span>通知の許可ダイアログで「許可」をタップ',
+    notifStepsEdge: '<span class="step-num">1</span>アドレスバー左の🔒アイコンをクリック<br><span class="step-num">2</span>「通知」の権限を「許可」に変更<br><span class="step-num">3</span>ページを再読み込み',
+    notifClose: '閉じる',
+    memoTitleKonmari: '📝 ときめきメモ',
+    memoTitlePlain: '📝 ひとことメモ',
+    // ── dynamic (JS) ──
+    ambientRain: '雨音', ambientFire: '焚き火', ambientMute: '消音',
+    parseError: '解析できませんでした。日時を含めて入力してみてください。',
+    errAllDayAlarm: '終日イベントにはアラームを設定できません',
+    errNoNotifSupport: 'このブラウザは通知に対応していません',
+    errNotifBlocked: 'ブラウザの通知がブロックされています。設定から許可してください',
+    errAllDayReminder: '終日イベントにはリマインダーを設定できません',
+    warnTimePassed: 'その時間はすでに過ぎています',
+    detailStart: '開始', detailEnd: '終了', detailLocation: '場所', detailMemo: 'メモ',
+    allDayTag: ' （終日）', allDayTagHistory: '（終日）',
+    timeAdj15: '15分',
+    historyCountSuffix: '件',
+    deleteConfirm: function(title) { return '「' + title + '」を履歴から削除します。\nGoogleカレンダーからも手動で削除しますか？'; },
+    historyDetailsTitle: '詳細を見る', historyDeleteTitle: '削除',
+    alarmDescBoth: '5分前・1分前', alarmDesc5: '5分前', alarmDesc1: '1分前',
+    alarmDescStart: '開始時', alarmDescNow: '今すぐ',
+    alarmSetDoneMsg: function(t, h, m, d) { return '🔔 ' + t + '（' + h + ':' + m + '）の' + d + 'にアラーム設定済み'; },
+    alarmSetSuccessMsg: function(t, h, m, d) { return '🔔 ' + t + '（' + h + ':' + m + '）の' + d + 'にアラームを設定しました'; },
+    reminderLabel0: '開始時',
+    reminderLabelN: function(n) { return n + '分前'; },
+    reminderSetMsg: function(label) { return '🔔 ' + label + 'に通知します（このページを開いたままにしてください）'; },
+    notifLabelNow: 'まもなく開始',
+    notifLabelN: function(n) { return 'あと' + n + '分'; },
+    notifBody: function(label, time, loc) { return label + '（' + time + '〜）' + (loc ? '\n📍 ' + loc : ''); },
+    reminderScheduledMsg: function(labels) { return '🔔 通知予約中：' + labels; },
+    reminderJoinSep: '、',
+    notifHelpCheckBtn: '🔧 通知の許可方法を確認',
+    wakuAddedToast: '📌 ワクワクリストに追加しました',
+    unpinTitle: 'ピン解除', pinTitle: 'ピン留め',
+    sendByEmail: '✉️ メールで送る',
+    memoListSubject: function(d) { return 'メモ一覧 (' + d + ')'; },
+    memoBullet: '・',
+    pomoWorkLabel: '集中', pomoBreakLabel: '休憩',
+    pomoNotifWorkDone: '集中タイム終了！休憩しましょう 🎉',
+    pomoNotifBreakDone: '休憩終了！集中タイムに戻りましょう 💪',
+    pomoNotifTitle: '🍅 ポモドーロ',
+    ganttLegendEvents: '予定',
+    minUnit: '分',
+  },
+  en: {
+    docTitle: 'totonoe-jikan — May today spark joy & growth',
+    lockBtnTitle: 'Screen Lock',
+    lockMsg: 'Hold to unlock',
+    pinnedTitle: '📌 Joy List',
+    pomoTitle: '🍅 Pomodoro Timer',
+    soundTest: '🔊 Sound Test',
+    pomoModeWork: 'Focus 25m',
+    pomoModeShort: 'Break 5m',
+    pomoModeLabelText: 'Focus',
+    pomoCount: 'Sessions: ',
+    ganttLabel: "📊 Today's Timeline",
+    memoAdd: 'Add',
+    memoInputPlaceholder: 'Type a memo...',
+    alarmBtn: 'Alarm',
+    parseBtn: 'Add to Calendar',
+    historyTitle: '📋 Events',
+    resultBadge: 'Parsed',
+    reminderLabel: '🔔 Reminders ',
+    notifSettingsBtn: 'Notification Settings ?',
+    reminderChip0: 'At start',
+    reminderChip5: '5 min before',
+    reminderChip10: '10 min before',
+    reminderChip15: '15 min before',
+    reminderChip30: '30 min before',
+    editLabelTitle: 'Title',
+    editLabelStart: 'Start',
+    editLabelEnd: 'End',
+    editLabelLocation: 'Location',
+    editLabelMemo: 'Memo',
+    optionalPlaceholder: '(optional)',
+    editToggleClosed: '✏️ Edit Details',
+    editToggleOpen: '▲ Close editor',
+    gcalBtn: 'Add to Google Calendar',
+    backBtn: '← Back',
+    themeKonmari: 'KonMari', themePink: 'Pink', themeMint: 'Mint',
+    themeLavender: 'Lavender', themeSky: 'Sky', themePeach: 'Peach', themeDark: 'Dark',
+    footer1: 'totonoe-jikan No account needed, runs in browser',
+    footer2: 'by fukui.konmari',
+    notifH3: '🔔 How to Enable Notifications',
+    browserChromePc: 'Chrome (PC)',
+    browserChromeMobile: 'Chrome (Mobile)',
+    browserSafariMac: 'Safari (Mac)',
+    browserSafariIphone: 'Safari (iPhone)',
+    notifStepsChromePc: '<span class="step-num">1</span>Click the 🔒 icon in the address bar<br><span class="step-num">2</span>Change "Notifications" to "Allow"<br><span class="step-num">3</span>Reload the page',
+    notifStepsChromeMobile: '<span class="step-num">1</span>Tap ⋮ → "Site settings"<br><span class="step-num">2</span>Change "Notifications" to "Allow"<br><span class="step-num">3</span>Reload the page',
+    notifStepsSafariMac: '<span class="step-num">1</span>Safari → Settings → Websites → Notifications<br><span class="step-num">2</span>Change this site to "Allow"<br><span class="step-num">3</span>Reload the page',
+    notifStepsSafariIphone: '<span class="step-num">1</span>Add this page to Home Screen<br><span class="step-num">2</span>Open from Home Screen<br><span class="step-num">3</span>Tap "Allow" on the notification permission dialog',
+    notifStepsEdge: '<span class="step-num">1</span>Click the 🔒 icon in the address bar<br><span class="step-num">2</span>Change notification permission to "Allow"<br><span class="step-num">3</span>Reload the page',
+    notifClose: 'Close',
+    memoTitleKonmari: '📝 Quick Memo',
+    memoTitlePlain: '📝 Quick Memo',
+    // ── dynamic (JS) ──
+    ambientRain: 'Rain', ambientFire: 'Fire', ambientMute: 'Mute',
+    parseError: 'Could not parse. Please include date and time.',
+    errAllDayAlarm: 'Cannot set alarm for all-day events',
+    errNoNotifSupport: 'This browser does not support notifications',
+    errNotifBlocked: 'Browser notifications are blocked. Please allow in settings',
+    errAllDayReminder: 'Cannot set reminder for all-day events',
+    warnTimePassed: 'That time has already passed',
+    detailStart: 'Start', detailEnd: 'End', detailLocation: 'Location', detailMemo: 'Memo',
+    allDayTag: ' (all day)', allDayTagHistory: ' (all day)',
+    timeAdj15: '15m',
+    historyCountSuffix: ' items',
+    deleteConfirm: function(title) { return 'Delete "' + title + '" from history?\nRemember to remove it from Google Calendar manually.'; },
+    historyDetailsTitle: 'Details', historyDeleteTitle: 'Delete',
+    alarmDescBoth: '5m & 1m before', alarmDesc5: '5m before', alarmDesc1: '1m before',
+    alarmDescStart: 'At start', alarmDescNow: 'Now',
+    alarmSetDoneMsg: function(t, h, m, d) { return '🔔 ' + t + ' (' + h + ':' + m + ') alarm set: ' + d; },
+    alarmSetSuccessMsg: function(t, h, m, d) { return '🔔 ' + t + ' (' + h + ':' + m + ') alarm set: ' + d; },
+    reminderLabel0: 'At start',
+    reminderLabelN: function(n) { return n + 'm before'; },
+    reminderSetMsg: function(label) { return '🔔 Will notify ' + label + ' (keep this page open)'; },
+    notifLabelNow: 'Starting now',
+    notifLabelN: function(n) { return n + 'm left'; },
+    notifBody: function(label, time, loc) { return label + ' (' + time + '~)' + (loc ? '\n📍 ' + loc : ''); },
+    reminderScheduledMsg: function(labels) { return '🔔 Notifications scheduled: ' + labels; },
+    reminderJoinSep: ', ',
+    notifHelpCheckBtn: '🔧 How to enable notifications',
+    wakuAddedToast: '📌 Added to Joy List',
+    unpinTitle: 'Unpin', pinTitle: 'Pin',
+    sendByEmail: '✉️ Send by email',
+    memoListSubject: function(d) { return 'Memo list (' + d + ')'; },
+    memoBullet: '- ',
+    pomoWorkLabel: 'Focus', pomoBreakLabel: 'Break',
+    pomoNotifWorkDone: 'Focus time done! Take a break 🎉',
+    pomoNotifBreakDone: 'Break over! Back to focus 💪',
+    pomoNotifTitle: '🍅 Pomodoro',
+    ganttLegendEvents: 'Events',
+    minUnit: 'm',
+  },
+};
+
+function detectLang() {
+  try {
+    const saved = localStorage.getItem('aical_lang');
+    if (saved === 'ja' || saved === 'en') return saved;
+  } catch(e) {}
+  const nav = (navigator.language || 'ja').toLowerCase();
+  return nav.indexOf('ja') === 0 ? 'ja' : 'en';
+}
+let currentLang = detectLang();
+
+function t(key) {
+  const d = I18N[currentLang] || I18N.ja;
+  let v = d[key];
+  if (v === undefined) v = I18N.ja[key];
+  return v !== undefined ? v : key;
+}
+
+function applyStaticI18n() {
+  const d = I18N[currentLang] || I18N.ja;
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    const k = el.getAttribute('data-i18n');
+    if (d[k] !== undefined) el.textContent = d[k];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+    const k = el.getAttribute('data-i18n-html');
+    if (d[k] !== undefined) el.innerHTML = d[k];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+    const k = el.getAttribute('data-i18n-placeholder');
+    if (d[k] !== undefined) el.setAttribute('placeholder', d[k]);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+    const k = el.getAttribute('data-i18n-title');
+    if (d[k] !== undefined) el.setAttribute('title', d[k]);
+  });
+  document.documentElement.lang = currentLang;
+  document.title = d.docTitle;
+  const lb = document.getElementById('langBtn');
+  if (lb) lb.textContent = currentLang === 'ja' ? '🌐 EN' : '🌐 日本語';
+}
+
+function setLang(lang) {
+  if (lang !== 'ja' && lang !== 'en') return;
+  currentLang = lang;
+  try { localStorage.setItem('aical_lang', lang); } catch(e) {}
+  applyStaticI18n();
+  // restart typing-placeholder animation in the new language
+  if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+  exIdx = 0; charIdx = 0;
+  const pt = document.getElementById('placeholderText');
+  if (pt) pt.textContent = '';
+  animatePlaceholder();
+  // re-render dynamic content
+  updateThemeLabels();
+  renderHistory();
+  renderMemos();
+  ganttRender();
+  pomoUpdateModeButtons();
+  updateReminderStatusText();
+  // ambient sound button label
+  const tb = document.getElementById('tickMuteBtn');
+  if (tb && typeof AMBIENT_CYCLE !== 'undefined') {
+    const e = pomoTickMuted ? AMBIENT_CYCLE[2]
+      : (AMBIENT_CYCLE.find(function(a){ return a.type === ambientType; }) || AMBIENT_CYCLE[0]);
+    tb.textContent = e.icon + ' ' + t(e.key);
+  }
+  // edit-toggle button + result phase
+  const et = document.getElementById('editToggle');
+  if (et) et.textContent = editOpen ? t('editToggleOpen') : t('editToggleClosed');
+  const rp = document.getElementById('resultPhase');
+  if (currentEvent && rp && rp.classList.contains('active')) renderResult();
+}
+function toggleLang() { setLang(currentLang === 'ja' ? 'en' : 'ja'); }
+
+applyStaticI18n();
 
 // ════════════════════════════════════════
 // Alarm AudioContext - kept alive from user gesture until alarm fires
@@ -2066,9 +2345,9 @@ function setupAudioResume() {
 })();
 
 const AMBIENT_CYCLE = [
-  { type: 'rain',  icon: '🌧', label: '雨音' },
-  { type: 'fire',  icon: '🔥', label: '焚き火' },
-  { type: 'mute',  icon: '🔇', label: '消音' },
+  { type: 'rain',  icon: '🌧', key: 'ambientRain' },
+  { type: 'fire',  icon: '🔥', key: 'ambientFire' },
+  { type: 'mute',  icon: '🔇', key: 'ambientMute' },
 ];
 
 function cycleAmbient() {
@@ -2083,12 +2362,12 @@ function cycleAmbient() {
 
   if (next.type === 'mute') {
     pomoTickMuted = true;
-    btn.textContent = next.icon + ' ' + next.label;
+    btn.textContent = next.icon + ' ' + t(next.key);
     btn.style.color = '#f87171';
   } else {
     pomoTickMuted = false;
     ambientType = next.type;
-    btn.textContent = next.icon + ' ' + next.label;
+    btn.textContent = next.icon + ' ' + t(next.key);
     btn.style.color = 'var(--text-dim)';
     if (pomoRunning && pomoMode === 'work') {
       startRain();
@@ -2100,18 +2379,21 @@ function cycleAmbient() {
 function restoreAmbient() {
   try {
     const data = JSON.parse(localStorage.getItem('aical_ambient'));
-    if (!data) return;
     const btn = document.getElementById('tickMuteBtn');
+    if (!data) {
+      if (btn) btn.textContent = AMBIENT_CYCLE[0].icon + ' ' + t(AMBIENT_CYCLE[0].key);
+      return;
+    }
     if (data.type === 'mute') {
       pomoTickMuted = true;
-      btn.textContent = '🔇 消音';
+      btn.textContent = '🔇 ' + t('ambientMute');
       btn.style.color = '#f87171';
     } else {
       const entry = AMBIENT_CYCLE.find(a => a.type === data.type);
       if (entry) {
         ambientType = entry.type;
         pomoTickMuted = false;
-        btn.textContent = entry.icon + ' ' + entry.label;
+        btn.textContent = entry.icon + ' ' + t(entry.key);
         btn.style.color = 'var(--text-dim)';
       }
     }
@@ -2285,13 +2567,23 @@ function playSound(type) {
   }
 }
 
-const EXAMPLES = [
-  "来週の月曜 1400-1500 チームミーティング",
-  "明日 1030 歯医者の予約",
-  "3/1 1900 渋谷で友達とディナー",
-  "今週の金曜 1300-1430 プロジェクト報告会",
-  "2/20 終日 有給休暇",
-];
+const EXAMPLES_BY_LANG = {
+  ja: [
+    "来週の月曜 1400-1500 チームミーティング",
+    "明日 1030 歯医者の予約",
+    "3/1 1900 渋谷で友達とディナー",
+    "今週の金曜 1300-1430 プロジェクト報告会",
+    "2/20 終日 有給休暇",
+  ],
+  en: [
+    "Next Monday 1400-1500 Team Meeting",
+    "Tomorrow 1030 Dentist appointment",
+    "3/1 1900 Dinner with friends",
+    "This Friday 1300-1430 Project review",
+    "2/20 all day Vacation",
+  ],
+};
+function getExamples() { return EXAMPLES_BY_LANG[currentLang] || EXAMPLES_BY_LANG.ja; }
 
 // ════════════════════════════════════════
 //  Typing placeholder animation
@@ -2300,7 +2592,8 @@ let exIdx = 0, charIdx = 0, typingTimer = null;
 
 function animatePlaceholder() {
   const el = document.getElementById('placeholderText');
-  const example = EXAMPLES[exIdx];
+  const _ex = getExamples();
+  const example = _ex[exIdx % _ex.length];
 
   if (charIdx <= example.length) {
     el.textContent = example.slice(0, charIdx);
@@ -2310,7 +2603,7 @@ function animatePlaceholder() {
     typingTimer = setTimeout(() => {
       el.textContent = '';
       charIdx = 0;
-      exIdx = (exIdx + 1) % EXAMPLES.length;
+      exIdx = (exIdx + 1) % getExamples().length;
       typingTimer = setTimeout(animatePlaceholder, 400);
     }, 2200);
   }
@@ -2340,7 +2633,7 @@ function parseInput() {
     currentEvent = parseJapaneseEvent(text);
     showResult();
   } catch (e) {
-    document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
+    document.getElementById('errorMsg').textContent = t('parseError');
     document.getElementById('errorMsg').style.display = 'block';
   }
 }
@@ -2354,7 +2647,7 @@ async function parseAndAlarmOnly() {
   try {
     currentEvent = parseJapaneseEvent(text);
   } catch (e) {
-    document.getElementById('errorMsg').textContent = '解析できませんでした。日時を含めて入力してみてください。';
+    document.getElementById('errorMsg').textContent = t('parseError');
     document.getElementById('errorMsg').style.display = 'block';
     return;
   }
@@ -2362,19 +2655,19 @@ async function parseAndAlarmOnly() {
   // Set alarms directly without showing result screen
   const ev = currentEvent;
   if (ev.allDay) {
-    document.getElementById('errorMsg').textContent = '終日イベントにはアラームを設定できません';
+    document.getElementById('errorMsg').textContent = t('errAllDayAlarm');
     document.getElementById('errorMsg').style.display = 'block';
     return;
   }
 
   const perm = await requestNotificationPermission();
   if (perm === 'unsupported') {
-    document.getElementById('errorMsg').textContent = 'このブラウザは通知に対応していません';
+    document.getElementById('errorMsg').textContent = t('errNoNotifSupport');
     document.getElementById('errorMsg').style.display = 'block';
     return;
   }
   if (perm === 'denied') {
-    document.getElementById('errorMsg').textContent = 'ブラウザの通知がブロックされています。設定から許可してください';
+    document.getElementById('errorMsg').textContent = t('errNotifBlocked');
     document.getElementById('errorMsg').style.display = 'block';
     return;
   }
@@ -2450,12 +2743,227 @@ async function parseAndAlarmOnly() {
   const errEl = document.getElementById('errorMsg');
   errEl.style.display = 'block';
   errEl.style.color = '#2DD4BF';
-  const alarmDesc = fire5 > now && fire1 > now ? '5分前・1分前' : fire5 > now ? '5分前' : fire1 > now ? '1分前' : eventTime > now ? '開始時' : '今すぐ';
-  errEl.textContent = `🔔 ${ev.title}（${h}:${m}）の${alarmDesc}にアラーム設定済み`;
+  const alarmDesc = fire5 > now && fire1 > now ? t('alarmDescBoth') : fire5 > now ? t('alarmDesc5') : fire1 > now ? t('alarmDesc1') : eventTime > now ? t('alarmDescStart') : t('alarmDescNow');
+  errEl.textContent = t('alarmSetDoneMsg')(ev.title, h, m, alarmDesc);
   setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = ''; }, 3000);
 }
 
+function parseEnEvent(text) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  let year = now.getFullYear();
+  let month = null, day = null;
+  let startHour = null, startMin = 0;
+  let endHour = null, endMin = 0;
+  let allDay = false;
+  let location = null;
+  let title = text;
+
+  // All day
+  if (/all\s*day/i.test(text)) {
+    allDay = true;
+    title = title.replace(/all\s*day/i, '').trim();
+  }
+
+  // Day names
+  const dayNames = { 'sun': 0, 'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
+
+  // Tomorrow
+  if (/\btomorrow\b/i.test(text)) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/\btomorrow\b/i, '').trim();
+  }
+  // Day after tomorrow
+  else if (/\bday\s+after\s+tomorrow\b/i.test(text)) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 2);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/\bday\s+after\s+tomorrow\b/i, '').trim();
+  }
+  // Today
+  else if (/\btoday\b/i.test(text)) {
+    month = now.getMonth() + 1;
+    day = now.getDate();
+    title = title.replace(/\btoday\b/i, '').trim();
+  }
+  // Next + weekday
+  else if (/\bnext\s+(sun|mon|tue|wed|thu|fri|sat)\w*/i.test(text)) {
+    const m = text.match(/\bnext\s+(sun|mon|tue|wed|thu|fri|sat)\w*/i);
+    const target = dayNames[m[1].toLowerCase().slice(0,3)];
+    const d = new Date(now);
+    const diff = ((target - d.getDay()) + 7) % 7 || 7;
+    d.setDate(d.getDate() + diff + 7);
+    if (diff > 0 && diff <= 6) d.setDate(d.getDate() - 7);
+    // Always push to next week
+    d.setDate(d.getDate());
+    const dd = new Date(now);
+    const diff2 = ((target - dd.getDay()) + 7) % 7 || 7;
+    dd.setDate(dd.getDate() + diff2);
+    if (dd <= now) dd.setDate(dd.getDate() + 7);
+    month = dd.getMonth() + 1;
+    day = dd.getDate();
+    year = dd.getFullYear();
+    title = title.replace(/\bnext\s+\w+/i, '').trim();
+  }
+  // This + weekday
+  else if (/\bthis\s+(sun|mon|tue|wed|thu|fri|sat)\w*/i.test(text)) {
+    const m = text.match(/\bthis\s+(sun|mon|tue|wed|thu|fri|sat)\w*/i);
+    const target = dayNames[m[1].toLowerCase().slice(0,3)];
+    const d = new Date(now);
+    const diff = ((target - d.getDay()) + 7) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/\bthis\s+\w+/i, '').trim();
+  }
+  // Weekday name alone
+  else if (/\b(sun|mon|tue|wed|thu|fri|sat)\w*day?\b/i.test(text) && !/\bnext\b/i.test(text) && !/\bthis\b/i.test(text)) {
+    const m = text.match(/\b(sun|mon|tue|wed|thu|fri|sat)\w*/i);
+    const target = dayNames[m[1].toLowerCase().slice(0,3)];
+    const d = new Date(now);
+    const diff = ((target - d.getDay()) + 7) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    month = d.getMonth() + 1;
+    day = d.getDate();
+    year = d.getFullYear();
+    title = title.replace(/\b(sun|mon|tue|wed|thu|fri|sat)\w*\b/i, '').trim();
+  }
+
+  // Date patterns
+  const datePatterns = [
+    { re: /(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/, groups: [1,2,3], hasYear: true },
+    { re: /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, groups: [3,1,2], hasYear: true },
+    { re: /(\d{1,2})[\/\-](\d{1,2})/, groups: [1,2], hasYear: false },
+  ];
+
+  if (month === null) {
+    for (const pat of datePatterns) {
+      const m = text.match(pat.re);
+      if (m) {
+        if (pat.hasYear) {
+          year = parseInt(m[pat.groups[0]]);
+          month = parseInt(m[pat.groups[1]]);
+          day = parseInt(m[pat.groups[2]]);
+        } else {
+          month = parseInt(m[pat.groups[0]]);
+          day = parseInt(m[pat.groups[1]]);
+        }
+        title = title.replace(m[0], '').trim();
+        break;
+      }
+    }
+  }
+
+  if (month === null) {
+    month = now.getMonth() + 1;
+    day = now.getDate();
+  }
+
+  // Time range patterns
+  const timeRangePatterns = [
+    /(\d{1,2}):(\d{2})\s*[-~to]+\s*(\d{1,2}):(\d{2})/i,
+    /(?<!\d[\/-])(\d{3,4})\s*[-~to]+\s*(\d{3,4})(?![\/-]\d)/i,
+  ];
+
+  let timeFound = false;
+  for (const pat of timeRangePatterns) {
+    const m = text.match(pat);
+    if (m) {
+      if (m.length === 5) {
+        startHour = parseInt(m[1]); startMin = parseInt(m[2]);
+        endHour = parseInt(m[3]); endMin = parseInt(m[4]);
+      } else {
+        const s = m[1].padStart(4,'0'); const e = m[2].padStart(4,'0');
+        startHour = parseInt(s.slice(0,2)); startMin = parseInt(s.slice(2));
+        endHour = parseInt(e.slice(0,2)); endMin = parseInt(e.slice(2));
+      }
+      title = title.replace(m[0], '').trim();
+      timeFound = true;
+      break;
+    }
+  }
+
+  // Single time patterns
+  if (!timeFound) {
+    const singleTimePatterns = [
+      { re: /\b(\d{1,2}):(\d{2})\s*(am|pm)\b/i, ampm: 'match' },
+      { re: /\b(\d{1,2})\s*(am|pm)\b/i, ampm: 'match' },
+      { re: /\b(\d{1,2}):(\d{2})\b/, ampm: null },
+      { re: /\bat\s+(\d{3,4})\b/i, ampm: 'bare' },
+      { re: /(?<![\/-\d])(\d{3,4})(?![\/-\d])/, ampm: 'bare' },
+    ];
+
+    for (const pat of singleTimePatterns) {
+      const m = text.match(pat.re);
+      if (m) {
+        if (pat.ampm === 'bare') {
+          const s = m[1].padStart(4, '0');
+          startHour = parseInt(s.slice(0,2));
+          startMin = parseInt(s.slice(2));
+        } else if (pat.ampm === 'match') {
+          startHour = parseInt(m[1]);
+          startMin = m[2] && /\d/.test(m[2]) ? parseInt(m[2]) : 0;
+          const pm = (m[3] || '').toLowerCase() === 'pm';
+          if (pm && startHour < 12) startHour += 12;
+          if (!pm && (m[3] || '').toLowerCase() === 'am' && startHour === 12) startHour = 0;
+        } else {
+          startHour = parseInt(m[1]);
+          startMin = parseInt(m[2]);
+        }
+        title = title.replace(m[0], '').trim();
+        break;
+      }
+    }
+  }
+
+  if (allDay) {
+    const startDate = `${year}-${pad(month)}-${pad(day)}T00:00:00`;
+    const endDate = `${year}-${pad(month)}-${pad(day)}T23:59:00`;
+    title = title.replace(/^\s*[-,.:;]+|[-,.:;]+\s*$/g, '').trim();
+    if (!title) title = 'Event';
+    return { title, startDate, endDate, allDay: true, location, description: null };
+  }
+
+  if (startHour === null) throw new Error('No time found');
+  if (startHour > 23 || startMin > 59) throw new Error('Invalid time');
+
+  if (!endHour) {
+    endHour = startHour + 1;
+    endMin = startMin;
+    if (endHour > 23) { endHour = 23; endMin = 59; }
+  }
+
+  // Location: "at xxx"
+  const locMatch = text.match(/\bat\s+([A-Z][a-zA-Z\s]{1,30}?)(?:\s+\d|$)/);
+  if (locMatch) {
+    location = locMatch[1].trim();
+  }
+
+  // Clean up title
+  title = title
+    .replace(/\bat\b.*$/i, '')
+    .replace(/^\s*[-,.:;]+|[-,.:;]+\s*$/g, '')
+    .trim();
+  if (!title) title = 'Event';
+
+  const startDate = `${year}-${pad(month)}-${pad(day)}T${pad(startHour)}:${pad(startMin)}:00`;
+  const endDate = `${year}-${pad(month)}-${pad(day)}T${pad(endHour)}:${pad(endMin)}:00`;
+
+  return { title, startDate, endDate, allDay: false, location, description: null };
+}
+
 function parseJapaneseEvent(text) {
+  return currentLang === 'en' ? parseEnEvent(text) : parseJaEvent(text);
+}
+
+function parseJaEvent(text) {
   const now = new Date();
   let year = now.getFullYear();
   let month = null, day = null;
@@ -2733,7 +3241,7 @@ function showResult() {
   document.getElementById('resultPhase').classList.add('active');
   editOpen = false;
   document.getElementById('editSection').classList.remove('open');
-  document.getElementById('editToggle').textContent = '✏️ 内容を編集';
+  document.getElementById('editToggle').textContent = t('editToggleClosed');
 
   renderResult();
 
@@ -2752,11 +3260,11 @@ function renderResult() {
   bodyHTML += `<div class="detail-row">
     <div class="detail-icon">🗓</div>
     <div>
-      <div class="detail-label">開始</div>
-      <div class="detail-value">${formatJP(ev.startDate, ev.allDay)}${ev.allDay ? ' （終日）' : ''}</div>
+      <div class="detail-label">${t('detailStart')}</div>
+      <div class="detail-value">${formatJP(ev.startDate, ev.allDay)}${ev.allDay ? t('allDayTag') : ''}</div>
       ${!ev.allDay ? `<div class="time-adjuster">
         <button class="time-adj-btn" onclick="adjustTime('start', -15)">−</button>
-        <span class="time-adj-label">15分</span>
+        <span class="time-adj-label">${t('timeAdj15')}</span>
         <button class="time-adj-btn" onclick="adjustTime('start', 15)">+</button>
       </div>` : ''}
     </div>
@@ -2766,11 +3274,11 @@ function renderResult() {
     bodyHTML += `<div class="detail-row">
       <div class="detail-icon">🕐</div>
       <div>
-        <div class="detail-label">終了</div>
+        <div class="detail-label">${t('detailEnd')}</div>
         <div class="detail-value">${formatJP(ev.endDate, false)}</div>
         <div class="time-adjuster">
           <button class="time-adj-btn" onclick="adjustTime('end', -15)">−</button>
-          <span class="time-adj-label">15分</span>
+          <span class="time-adj-label">${t('timeAdj15')}</span>
           <button class="time-adj-btn" onclick="adjustTime('end', 15)">+</button>
         </div>
       </div>
@@ -2781,7 +3289,7 @@ function renderResult() {
     bodyHTML += `<div class="detail-row">
       <div class="detail-icon">📍</div>
       <div>
-        <div class="detail-label">場所</div>
+        <div class="detail-label">${t('detailLocation')}</div>
         <div class="detail-value">${escHTML(ev.location)}</div>
       </div>
     </div>`;
@@ -2791,7 +3299,7 @@ function renderResult() {
     bodyHTML += `<div class="detail-row">
       <div class="detail-icon">📝</div>
       <div>
-        <div class="detail-label">メモ</div>
+        <div class="detail-label">${t('detailMemo')}</div>
         <div class="detail-value">${escHTML(ev.description)}</div>
       </div>
     </div>`;
@@ -2822,7 +3330,7 @@ function getEditedEvent() {
 function toggleEdit() {
   editOpen = !editOpen;
   document.getElementById('editSection').classList.toggle('open', editOpen);
-  document.getElementById('editToggle').textContent = editOpen ? '▲ 編集を閉じる' : '✏️ 内容を編集';
+  document.getElementById('editToggle').textContent = editOpen ? t('editToggleOpen') : t('editToggleClosed');
   if (!editOpen) {
     // Apply edits
     currentEvent = getEditedEvent();
@@ -2880,7 +3388,7 @@ function deleteFromHistory(id) {
     const gcalUrl = `https://calendar.google.com/calendar/r/day/${dateStr}`;
 
     // Show confirmation with link
-    const msg = `「${entry.title}」を履歴から削除します。\nGoogleカレンダーからも手動で削除しますか？`;
+    const msg = t('deleteConfirm')(entry.title);
     if (confirm(msg)) {
       const a = document.createElement('a');
       a.href = gcalUrl;
@@ -2925,17 +3433,17 @@ function renderHistory() {
   }
 
   section.style.display = 'block';
-  countEl.textContent = list.length + '件';
+  countEl.textContent = list.length + t('historyCountSuffix');
 
   const now = new Date();
   container.innerHTML = list.map(entry => {
     const isUpcoming = safeParseDate(entry.startDate) > now;
     const dotClass = isUpcoming ? 'upcoming' : 'past';
     const dateStr = entry.allDay
-      ? formatJP(entry.startDate, true) + '（終日）'
+      ? formatJP(entry.startDate, true) + t('allDayTagHistory')
       : entry.alarmOnly
         ? formatJP(entry.startDate, false)
-        : formatJP(entry.startDate, false) + ' 〜 ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
+        : formatJP(entry.startDate, false) + ' - ' + safeParseDate(entry.endDate).getHours() + ':' + String(safeParseDate(entry.endDate).getMinutes()).padStart(2,'0');
     return `<div class="history-item">
       <div class="history-dot ${dotClass}"></div>
       <div class="history-info">
@@ -2943,8 +3451,8 @@ function renderHistory() {
         <div class="history-info-date">${escHTML(dateStr)}${entry.location ? ' 📍' + escHTML(entry.location) : ''}</div>
       </div>
       <div class="history-actions">
-        ${entry.alarmOnly ? '' : '<button class="history-btn" onclick="reopenFromHistory(' + entry.id + ')" title="詳細を見る">📅</button>'}
-        <button class="history-btn delete" onclick="deleteFromHistory(${entry.id})" title="削除">✕</button>
+        ${entry.alarmOnly ? '' : '<button class="history-btn" onclick="reopenFromHistory(' + entry.id + ')" title="' + t('historyDetailsTitle') + '">📅</button>'}
+        <button class="history-btn delete" onclick="deleteFromHistory(${entry.id})" title="${t('historyDeleteTitle')}">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -3021,17 +3529,17 @@ function downloadICS() {
 async function alarmOnly() {
   const ev = getEditedEvent();
   if (ev.allDay) {
-    showReminderStatus('error', '終日イベントにはアラームを設定できません');
+    showReminderStatus('error', t('errAllDayAlarm'));
     return;
   }
 
   const perm = await requestNotificationPermission();
   if (perm === 'unsupported') {
-    showReminderStatus('error', 'このブラウザは通知に対応していません');
+    showReminderStatus('error', t('errNoNotifSupport'));
     return;
   }
   if (perm === 'denied') {
-    showReminderStatus('error', 'ブラウザの通知がブロックされています。設定から許可してください');
+    showReminderStatus('error', t('errNotifBlocked'));
     return;
   }
 
@@ -3106,8 +3614,8 @@ async function alarmOnly() {
   const startTime = safeParseDate(ev.startDate);
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
-  const alarmDesc = fire5 > now && fire1 > now ? '5分前・1分前' : fire5 > now ? '5分前' : fire1 > now ? '1分前' : eventTime > now ? '開始時' : '今すぐ';
-  showReminderStatus('success', `🔔 ${ev.title}（${h}:${m}）の${alarmDesc}にアラームを設定しました`);
+  const alarmDesc = fire5 > now && fire1 > now ? t('alarmDescBoth') : fire5 > now ? t('alarmDesc5') : fire1 > now ? t('alarmDesc1') : eventTime > now ? t('alarmDescStart') : t('alarmDescNow');
+  showReminderStatus('success', t('alarmSetSuccessMsg')(ev.title, h, m, alarmDesc));
 
   // Go back to input after short delay
   setTimeout(() => { goBack(); }, 1500);
@@ -3130,14 +3638,22 @@ function safeParseDate(str) {
 
 function formatJP(dateStr, allDay) {
   const d = safeParseDate(dateStr);
-  const days = ['日','月','火','水','木','金','土'];
   const y = d.getFullYear();
   const m = d.getMonth() + 1;
   const dd = d.getDate();
+  if (currentLang === 'en') {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const w = days[d.getDay()];
+    const mm = String(m).padStart(2, '0');
+    const ddp = String(dd).padStart(2, '0');
+    if (allDay) return `${w}, ${y}-${mm}-${ddp}`;
+    const h = String(d.getHours());
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${w}, ${y}-${mm}-${ddp} ${h}:${min}`;
+  }
+  const days = ['日','月','火','水','木','金','土'];
   const w = days[d.getDay()];
-
   if (allDay) return `${y}年${m}月${dd}日（${w}）`;
-
   const h = String(d.getHours());
   const min = String(d.getMinutes()).padStart(2, '0');
   return `${y}年${m}月${dd}日（${w}） ${h}:${min}`;
@@ -3186,18 +3702,18 @@ async function requestNotificationPermission() {
 async function setReminder(minBefore) {
   const ev = getEditedEvent();
   if (ev.allDay) {
-    showReminderStatus('error', '終日イベントにはリマインダーを設定できません');
+    showReminderStatus('error', t('errAllDayReminder'));
     return;
   }
 
   // Check notification support & permission
   const perm = await requestNotificationPermission();
   if (perm === 'unsupported') {
-    showReminderStatus('error', 'このブラウザは通知に対応していません');
+    showReminderStatus('error', t('errNoNotifSupport'));
     return;
   }
   if (perm === 'denied') {
-    showReminderStatus('error', 'ブラウザの通知がブロックされています。設定から許可してください');
+    showReminderStatus('error', t('errNotifBlocked'));
     return;
   }
 
@@ -3222,7 +3738,7 @@ async function setReminder(minBefore) {
   const now = Date.now();
 
   if (fireTime <= now) {
-    showReminderStatus('warning', 'その時間はすでに過ぎています');
+    showReminderStatus('warning', t('warnTimePassed'));
     return;
   }
 
@@ -3238,8 +3754,8 @@ async function setReminder(minBefore) {
   activeReminders.push({ timerId, minBefore, fireTime, eventStart: ev.startDate });
   updateReminderChips();
 
-  const label = minBefore === 0 ? '開始時' : `${minBefore}分前`;
-  showReminderStatus('success', `🔔 ${label}に通知します（このページを開いたままにしてください）`);
+  const label = minBefore === 0 ? t('reminderLabel0') : t('reminderLabelN')(minBefore);
+  showReminderStatus('success', t('reminderSetMsg')(label));
   renderHistory();
 }
 
@@ -3248,7 +3764,7 @@ let notifQueue = [];
 let notifTimer = null;
 
 function sendNotification(ev, minBefore) {
-  const label = minBefore === 0 ? 'まもなく開始' : `あと${minBefore}分`;
+  const label = minBefore === 0 ? t('notifLabelNow') : t('notifLabelN')(minBefore);
   const startTime = safeParseDate(ev.startDate);
   const h = String(startTime.getHours());
   const m = String(startTime.getMinutes()).padStart(2, '0');
@@ -3274,7 +3790,7 @@ function flushNotifications() {
   batch.forEach(n => {
     try {
       new Notification(`📅 ${n.title}`, {
-        body: `${n.label}（${n.time}〜）${n.location ? '\n📍 ' + n.location : ''}`,
+        body: t('notifBody')(n.label, n.time, n.location),
         icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📅</text></svg>',
       });
     } catch(e) {}
@@ -3343,8 +3859,8 @@ function updateReminderStatusText() {
     document.getElementById('reminderStatus').innerHTML = '';
     return;
   }
-  const labels = activeReminders.map(r => r.minBefore === 0 ? '開始時' : `${r.minBefore}分前`).join('、');
-  showReminderStatus('success', `🔔 通知予約中：${labels}`);
+  const labels = activeReminders.map(r => r.minBefore === 0 ? t('reminderLabel0') : t('reminderLabelN')(r.minBefore)).join(t('reminderJoinSep'));
+  showReminderStatus('success', t('reminderScheduledMsg')(labels));
 }
 
 function showReminderStatus(type, message) {
@@ -3355,7 +3871,7 @@ function showReminderStatus(type, message) {
     el.innerHTML = `<div class="reminder-status warning">⚠️ ${escHTML(message)}</div>`;
   } else {
     el.innerHTML = `<div class="reminder-status error">❌ ${escHTML(message)}</div>
-      <button class="notif-help-btn" onclick="openNotifHelp()">🔧 通知の許可方法を確認</button>`;
+      <button class="notif-help-btn" onclick="openNotifHelp()">${t('notifHelpCheckBtn')}</button>`;
   }
 }
 
@@ -3452,7 +3968,7 @@ function addWaku() {
   saveMemos(list);
   input.value = '';
   renderMemos();
-  showToast('📌 ワクワクリストに追加しました');
+  showToast(t('wakuAddedToast'));
 }
 
 function deleteMemo(id) {
@@ -3520,7 +4036,7 @@ function renderMemos() {
     pinnedList.innerHTML = pinnedMemos.map(m => `<div class="pinned-item" draggable="true" data-id="${m.id}">
       <span class="pinned-item-grip">⠿</span>
       <span class="pinned-item-text" contenteditable="true" onblur="editPinnedMemo(${m.id}, this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${escHTML(m.text)}</span>
-      <button class="pinned-item-unpin" onclick="unpinMemo(${m.id})" title="ピン解除">✕</button>
+      <button class="pinned-item-unpin" onclick="unpinMemo(${m.id})" title="${t('unpinTitle')}">✕</button>
     </div>`).join('');
     initPinnedDrag();
   } else {
@@ -3539,7 +4055,7 @@ function renderMemos() {
     const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     const pinCls = m.pinned ? ' pinned' : '';
     return `<div class="memo-item">
-      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? 'ピン解除' : 'ピン留め'}">📌</button>
+      <button class="memo-item-pin${pinCls}" onclick="togglePin(${m.id})" title="${m.pinned ? t('unpinTitle') : t('pinTitle')}">📌</button>
       <div style="flex:1">
         <div class="memo-item-text">${escHTML(m.text)}</div>
       </div>
@@ -3548,7 +4064,7 @@ function renderMemos() {
     </div>`;
   }).join('');
 
-  html += `<a class="memo-gmail-btn" href="${buildGmailAllUrl()}">✉️ メールで送る</a>`;
+  html += `<a class="memo-gmail-btn" href="${buildGmailAllUrl()}">${t('sendByEmail')}</a>`;
 
   el.innerHTML = html;
 }
@@ -3673,11 +4189,11 @@ function buildGmailAllUrl() {
   if (list.length === 0) return '#';
   const today = new Date();
   const dateStr = `${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`;
-  const subject = encodeURIComponent(`メモ一覧 (${dateStr})`);
+  const subject = encodeURIComponent(t('memoListSubject')(dateStr));
   const lines = list.map(m => {
     const d = new Date(m.createdAt);
     const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-    return `・${m.text}  (${time})`;
+    return `${t('memoBullet')}${m.text}  (${time})`;
   });
   const body = encodeURIComponent(lines.join('\n') + '\n\n— totonoe-jikan');
   return `mailto:?subject=${subject}&body=${body}`;
@@ -3951,9 +4467,9 @@ function pomoComplete() {
   try {
     if ('Notification' in window && Notification.permission === 'granted') {
       const msg = prevMode === 'work'
-        ? workLabel() + 'タイム終了！休憩しましょう 🎉'
-        : '休憩終了！' + workLabel() + 'タイムに戻りましょう 💪';
-      new Notification('🍅 ポモドーロ', {
+        ? t('pomoNotifWorkDone')
+        : t('pomoNotifBreakDone');
+      new Notification(t('pomoNotifTitle'), {
         body: msg,
         icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍅</text></svg>',
       });
@@ -4087,9 +4603,9 @@ function ganttUpdateSummary(logs) {
   }
 
   document.getElementById('pomoGanttSummary').innerHTML = `
-    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-work)"></div> ${workLabel()} ${Math.round(workMin)}分</div>
-    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-break)"></div> 休憩 ${Math.round(breakMin)}分</div>
-    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:rgba(255,179,71,0.5);border:1px solid rgba(255,179,71,0.7)"></div> 予定</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-work)"></div> ${workLabel()} ${Math.round(workMin)}${t('minUnit')}</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:var(--ring-break)"></div> ${t('pomoBreakLabel')} ${Math.round(breakMin)}${t('minUnit')}</div>
+    <div class="pomo-gantt-legend"><div class="pomo-gantt-legend-dot" style="background:rgba(255,179,71,0.5);border:1px solid rgba(255,179,71,0.7)"></div> ${t('ganttLegendEvents')}</div>
   `;
 }
 
@@ -4176,7 +4692,7 @@ setInterval(() => { checkDayChange(); if (!pomoRunning) ganttRender(); }, 60000)
 function isKonmari() {
   return document.documentElement.getAttribute('data-theme') === 'konmari-beige';
 }
-function workLabel() { return '集中'; }
+function workLabel() { return t('pomoWorkLabel'); }
 
 function setTheme(theme) {
   if (theme) {
@@ -4192,12 +4708,12 @@ function setTheme(theme) {
 }
 
 function updateThemeLabels() {
-  const wl = workLabel();
-  const memoTitle = isKonmari() ? '📝 ときめきメモ' : '📝 ひとことメモ';
-  const workBtn = document.getElementById('pomoModeWork');
-  if (workBtn) workBtn.textContent = wl + ' 25分';
   const memoEl = document.querySelector('.memo-title');
-  if (memoEl) memoEl.textContent = memoTitle;
+  if (memoEl) {
+    memoEl.textContent = currentLang === 'ja'
+      ? (isKonmari() ? I18N.ja.memoTitleKonmari : I18N.ja.memoTitlePlain)
+      : I18N.en.memoTitlePlain;
+  }
   const sparkEl = document.getElementById('pomoSparkJoy');
   if (sparkEl) {
     if (isKonmari()) {
@@ -4219,7 +4735,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.3.17-05.23').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.5.24-21.45').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
