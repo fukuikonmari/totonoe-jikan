@@ -1962,6 +1962,7 @@ const I18N = {
     // ── dynamic (JS) ──
     ambientRain: '雨音', ambientFire: '焚き火', ambientMute: '消音',
     parseError: '解析できませんでした。日時を含めて入力してみてください。',
+    parserDefaultTitle: '予定',
     errAllDayAlarm: '終日イベントにはアラームを設定できません',
     errNoNotifSupport: 'このブラウザは通知に対応していません',
     errNotifBlocked: 'ブラウザの通知がブロックされています。設定から許可してください',
@@ -2053,6 +2054,7 @@ const I18N = {
     // ── dynamic (JS) ──
     ambientRain: 'Rain', ambientFire: 'Fire', ambientMute: 'Mute',
     parseError: 'Could not parse. Please include date and time.',
+    parserDefaultTitle: 'Event',
     errAllDayAlarm: 'Cannot set alarm for all-day events',
     errNoNotifSupport: 'This browser does not support notifications',
     errNotifBlocked: 'Browser notifications are blocked. Please allow in settings',
@@ -3205,7 +3207,7 @@ function parseJaEvent(text) {
     .replace(/(?:から|まで|にて|では|には|への|での|の|に|は|を|で|が|へ|と|も|、|\s)+$/, '')
     .trim();
 
-  if (!title) title = '予定';
+  if (!title) title = t('parserDefaultTitle');
 
   // ── Default date if none found ──
   if (month === null) {
