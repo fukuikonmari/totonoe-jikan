@@ -1621,7 +1621,7 @@
     <div class="pinned-section" id="pinnedSection" style="display:none">
       <div class="pinned-card">
         <div class="pinned-header">
-          <span class="pinned-title" data-i18n="pinnedTitle">📌 ワクワクリスト</span>
+          <span class="pinned-title">📌 ワクワクリスト</span>
         </div>
         <div class="pinned-list" id="pinnedList"></div>
       </div>
@@ -1845,7 +1845,7 @@
 
   <div class="footer" data-i18n="footer1">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.26-06.59</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.27-08.15</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1913,6 +1913,7 @@ const I18N = {
     lockBtnTitle: '画面ロック',
     lockMsg: '長押しで解除',
     pinnedTitle: '📌 ワクワクリスト',
+    pinnedTitleKonmari: '📌 ときめきリスト',
     pomoTitle: '🍅 ポモドーロタイマー',
     soundTest: '🔊 音テスト',
     pomoModeWork: '集中 25分',
@@ -2005,6 +2006,7 @@ const I18N = {
     lockBtnTitle: 'Screen Lock',
     lockMsg: 'Hold to unlock',
     pinnedTitle: '📌 Joy List',
+    pinnedTitleKonmari: '📌 Spark Joy List',
     pomoTitle: '🍅 Pomodoro Timer',
     soundTest: '🔊 Sound Test',
     pomoModeWork: 'Focus 25m',
@@ -4717,6 +4719,11 @@ function updateThemeLabels() {
       ? (isKonmari() ? I18N.ja.memoTitleKonmari : I18N.ja.memoTitlePlain)
       : I18N.en.memoTitlePlain;
   }
+  const pinnedEl = document.querySelector('.pinned-title');
+  if (pinnedEl) {
+    const dict = I18N[currentLang] || I18N.ja;
+    pinnedEl.textContent = isKonmari() ? dict.pinnedTitleKonmari : dict.pinnedTitle;
+  }
   const sparkEl = document.getElementById('pomoSparkJoy');
   if (sparkEl) {
     if (isKonmari()) {
@@ -4738,7 +4745,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.5.26-06.59').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.5.27-08.15').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
