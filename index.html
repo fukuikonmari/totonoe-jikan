@@ -11,8 +11,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192x192.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0A0E1A">
-<title>ととのえ時間−今日が成長＆ときめきの１日になりますように</title>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<title>ととのえ−今日が成長＆ときめきの１日になりますように</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Michroma&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Marcellus&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   input, textarea, button, select { -webkit-appearance: none; appearance: none; }
@@ -268,9 +268,10 @@
     box-shadow: 0 2px 8px var(--accent-glow);
   }
   .logo-text {
-    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-family: 'Marcellus', 'EB Garamond', serif;
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 400;
+    letter-spacing: 1.5px;
     background: linear-gradient(135deg, var(--text), var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1843,9 +1844,9 @@
     </div>
   </div>
 
-  <div class="footer" data-i18n="footer1">totonoe-jikan ブラウザ完結　アカウント登録不要</div>
+  <div class="footer" data-i18n="footer1">ととのえ ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.27-08.15</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.31-06.46</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1909,7 +1910,7 @@ let activeReminders = []; // {timerId, minBefore, fireTime, eventId}
 // ════════════════════════════════════════
 const I18N = {
   ja: {
-    docTitle: 'ととのえ時間−今日が成長＆ときめきの１日になりますように',
+    docTitle: 'ととのえ−今日が成長＆ときめきの１日になりますように',
     lockBtnTitle: '画面ロック',
     lockMsg: '長押しで解除',
     pinnedTitle: '📌 ワクワクリスト',
@@ -1946,7 +1947,7 @@ const I18N = {
     backBtn: '← 入力に戻る',
     themeKonmari: 'ときめき', themePink: 'ピンク', themeMint: 'ミント',
     themeLavender: 'ラベンダー', themeSky: 'スカイ', themePeach: 'ピーチ', themeDark: 'ダーク',
-    footer1: 'totonoe-jikan ブラウザ完結　アカウント登録不要',
+    footer1: 'ととのえ ブラウザ完結　アカウント登録不要',
     footer2: '制作：fukui.konmari',
     notifH3: '🔔 通知の許可方法',
     browserChromePc: 'Chrome（PC）',
@@ -1993,6 +1994,7 @@ const I18N = {
     unpinTitle: 'ピン解除', pinTitle: 'ピン留め',
     sendByEmail: '✉️ メールで送る',
     memoListSubject: function(d) { return 'メモ一覧 (' + d + ')'; },
+    memoEmailSignature: 'ととのえ',
     memoBullet: '・',
     pomoWorkLabel: '集中', pomoBreakLabel: '休憩',
     pomoNotifWorkDone: '集中タイム終了！休憩しましょう 🎉',
@@ -2002,7 +2004,7 @@ const I18N = {
     minUnit: '分',
   },
   en: {
-    docTitle: 'totonoe-jikan — May today spark joy & growth',
+    docTitle: 'totonoe — May today spark joy & growth',
     lockBtnTitle: 'Screen Lock',
     lockMsg: 'Hold to unlock',
     pinnedTitle: '📌 Joy List',
@@ -2039,7 +2041,7 @@ const I18N = {
     backBtn: '← Back',
     themeKonmari: 'KonMari', themePink: 'Pink', themeMint: 'Mint',
     themeLavender: 'Lavender', themeSky: 'Sky', themePeach: 'Peach', themeDark: 'Dark',
-    footer1: 'totonoe-jikan No account needed, runs in browser',
+    footer1: 'totonoe No account needed, runs in browser',
     footer2: 'by fukui.konmari',
     notifH3: '🔔 How to Enable Notifications',
     browserChromePc: 'Chrome (PC)',
@@ -2086,6 +2088,7 @@ const I18N = {
     unpinTitle: 'Unpin', pinTitle: 'Pin',
     sendByEmail: '✉️ Send by email',
     memoListSubject: function(d) { return 'Memo list (' + d + ')'; },
+    memoEmailSignature: 'totonoe',
     memoBullet: '- ',
     pomoWorkLabel: 'Focus', pomoBreakLabel: 'Break',
     pomoNotifWorkDone: 'Focus time done! Take a break 🎉',
@@ -4200,7 +4203,7 @@ function buildGmailAllUrl() {
     const time = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
     return `${t('memoBullet')}${m.text}  (${time})`;
   });
-  const body = encodeURIComponent(lines.join('\n') + '\n\n— totonoe-jikan');
+  const body = encodeURIComponent(lines.join('\n') + '\n\n— ' + t('memoEmailSignature'));
   return `mailto:?subject=${subject}&body=${body}`;
 }
 
@@ -4745,7 +4748,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.5.27-08.15').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.5.31-06.46').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
