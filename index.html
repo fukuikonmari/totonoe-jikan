@@ -1844,9 +1844,9 @@
     </div>
   </div>
 
-  <div class="footer" data-i18n="footer1">ととのえ ブラウザ完結　アカウント登録不要</div>
+  <div class="footer" data-i18n="footer1">ととのえ時間　ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.5.31-06.46</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.18-00.12</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -1947,7 +1947,7 @@ const I18N = {
     backBtn: '← 入力に戻る',
     themeKonmari: 'ときめき', themePink: 'ピンク', themeMint: 'ミント',
     themeLavender: 'ラベンダー', themeSky: 'スカイ', themePeach: 'ピーチ', themeDark: 'ダーク',
-    footer1: 'ととのえ ブラウザ完結　アカウント登録不要',
+    footer1: 'ととのえ時間　ブラウザ完結　アカウント登録不要',
     footer2: '制作：fukui.konmari',
     notifH3: '🔔 通知の許可方法',
     browserChromePc: 'Chrome（PC）',
@@ -2504,6 +2504,17 @@ function scheduleCountdown(secsLeft) {
     if (!rainCtx) return;
     rainCtx.resume();
     pomoCountdownScheduled = true;
+    // Fade out ambient sound (rain/fire) quickly so countdown ticks are audible
+    if (rainActive && rainGainNode) {
+      const fadeStart = rainCtx.currentTime;
+      const fadeDur = 0.3;
+      const currentGain = rainGainNode.gain.value;
+      rainGainNode.gain.cancelScheduledValues(fadeStart);
+      rainGainNode.gain.setValueAtTime(currentGain, fadeStart);
+      rainGainNode.gain.linearRampToValueAtTime(0.0001, fadeStart + fadeDur);
+      // Fully stop after the fade so processor is torn down cleanly
+      setTimeout(function() { stopRain(); }, Math.ceil(fadeDur * 1000) + 20);
+    }
     const t0 = rainCtx.currentTime;
 
     // Schedule ticks at precise 1-second intervals
@@ -4732,7 +4743,7 @@ function updateThemeLabels() {
     if (isKonmari()) {
       sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
     } else {
-      sparkEl.innerHTML = '<span class="spark-does">De la</span><br><span style="position:relative;left:-3px;font-size:14px">Joie？</span>';
+      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
     }
   }
 }
@@ -4748,7 +4759,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.5.31-06.46').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.7.18-00.12').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
