@@ -1846,7 +1846,7 @@
 
   <div class="footer" data-i18n="footer1">ととのえ時間　ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.18-00.12</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.18-08.22</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2504,16 +2504,18 @@ function scheduleCountdown(secsLeft) {
     if (!rainCtx) return;
     rainCtx.resume();
     pomoCountdownScheduled = true;
-    // Fade out ambient sound (rain/fire) quickly so countdown ticks are audible
+    // Duck ambient sound (rain/fire) during the countdown so ticks are audible,
+    // then restore it afterwards. Ambient keeps playing throughout.
     if (rainActive && rainGainNode) {
-      const fadeStart = rainCtx.currentTime;
-      const fadeDur = 0.3;
-      const currentGain = rainGainNode.gain.value;
-      rainGainNode.gain.cancelScheduledValues(fadeStart);
-      rainGainNode.gain.setValueAtTime(currentGain, fadeStart);
-      rainGainNode.gain.linearRampToValueAtTime(0.0001, fadeStart + fadeDur);
-      // Fully stop after the fade so processor is torn down cleanly
-      setTimeout(function() { stopRain(); }, Math.ceil(fadeDur * 1000) + 20);
+      const duckStart = rainCtx.currentTime;
+      const fullGain = (ambientType === 'fire') ? 5.0 : 10.0;  // canonical level
+      const duckGain = fullGain * 0.25;               // lower to 25% while ticks play
+      const restoreAt = duckStart + secsLeft + 1.2;   // after ticks + chime tail
+      rainGainNode.gain.cancelScheduledValues(duckStart);
+      rainGainNode.gain.setValueAtTime(fullGain, duckStart);
+      rainGainNode.gain.linearRampToValueAtTime(duckGain, duckStart + 0.25);
+      rainGainNode.gain.setValueAtTime(duckGain, restoreAt);
+      rainGainNode.gain.linearRampToValueAtTime(fullGain, restoreAt + 0.4);
     }
     const t0 = rainCtx.currentTime;
 
@@ -4759,7 +4761,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.7.18-00.12').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.7.18-08.22').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
