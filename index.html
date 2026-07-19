@@ -1846,7 +1846,7 @@
 
   <div class="footer" data-i18n="footer1">ととのえ時間　ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.19-11.33</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.19-11.42</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2556,7 +2556,7 @@ function playSound(type) {
 
     if (type === 'reminder') {
       const gain = rainCtx.createGain();
-      gain.gain.value = 2.5;
+      gain.gain.value = 1.0;
       gain.connect(rainCtx.destination);
       let t = rainCtx.currentTime;
       [{freq:880,dur:0.2},{freq:1100,dur:0.2},{freq:880,dur:0.2},{freq:1100,dur:0.3}].forEach(note => {
@@ -3840,7 +3840,7 @@ function flushNotifications() {
           { freq: 1100, dur: 0.3 },
         ];
         const gain = alarmCtx.createGain();
-        gain.gain.value = 2.5;
+        gain.gain.value = 1.0;
         gain.connect(alarmCtx.destination);
 
         let t = alarmCtx.currentTime;
@@ -4761,7 +4761,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.7.19-11.33').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.7.19-11.42').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
