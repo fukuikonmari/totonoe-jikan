@@ -1676,7 +1676,7 @@
               </g>
             </svg>
             <div class="pomo-time-inner">
-              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span></div>
+              <div class="pomo-spark-joy" id="pomoSparkJoy"><span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy?</span></div>
               <div class="pomo-time-text" id="pomoTimeText">25:00</div>
               <div class="pomo-mode-label" id="pomoModeLabel" data-i18n="pomoModeLabelText">集中</div>
             </div>
@@ -1846,7 +1846,7 @@
 
   <div class="footer" data-i18n="footer1">ととのえ時間　ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.18-08.22</div>
+  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.19-11.33</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -2509,7 +2509,7 @@ function scheduleCountdown(secsLeft) {
     if (rainActive && rainGainNode) {
       const duckStart = rainCtx.currentTime;
       const fullGain = (ambientType === 'fire') ? 5.0 : 10.0;  // canonical level
-      const duckGain = fullGain * 0.25;               // lower to 25% while ticks play
+      const duckGain = fullGain * 0.6;                // lower to 60% while ticks play
       const restoreAt = duckStart + secsLeft + 1.2;   // after ticks + chime tail
       rainGainNode.gain.cancelScheduledValues(duckStart);
       rainGainNode.gain.setValueAtTime(fullGain, duckStart);
@@ -4743,9 +4743,9 @@ function updateThemeLabels() {
   const sparkEl = document.getElementById('pomoSparkJoy');
   if (sparkEl) {
     if (isKonmari()) {
-      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
+      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy?</span>';
     } else {
-      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy？</span>';
+      sparkEl.innerHTML = '<span class="spark-does">Does it</span><br><span style="position:relative;left:-3px;font-size:14px">Spark Joy?</span>';
     }
   }
 }
@@ -4761,7 +4761,7 @@ function updateThemeLabels() {
 //  Service Worker (PWA)
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.7.18-08.22').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=2026.7.19-11.33').catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
