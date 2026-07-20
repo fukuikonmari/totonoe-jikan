@@ -1603,18 +1603,28 @@
   .al-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
   .al-tool-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .al-time-input {
-    width: 92px;
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    width: 104px;          /* 12時間表記の端末では「9:38 AM」まで出るため余裕を持たせる */
+    min-width: 104px;
     box-sizing: border-box;
-    padding: 9px 8px;
+    padding: 9px 6px;
     border-radius: 10px;
     border: 1.5px solid var(--border);
     background: var(--surface2);
     color: var(--text);
-    font-size: 15px;
+    font-size: 16px;       /* 16px未満だとiOSでフォーカス時に画面が拡大される */
     font-family: 'Noto Sans JP', sans-serif;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
     outline: none;
   }
+  /* Safari/Chromeの内部要素も中央に寄せる */
+  .al-time-input::-webkit-datetime-edit { text-align: center; width: 100%; }
+  .al-time-input::-webkit-datetime-edit-fields-wrapper { justify-content: center; }
+  .al-time-input::-webkit-calendar-picker-indicator { display: none; }
+  .al-input-row { flex-wrap: wrap; }
+  .al-input-row .al-select { flex: 1 1 110px; min-width: 110px; }
+  .al-input-row .memo-add-btn { flex: 0 0 auto; }
   .al-time-input:focus { border-color: var(--accent); }
   .al-date-bar {
     display: flex;
@@ -1727,20 +1737,23 @@
     animation: fadeIn 0.2s ease;
   }
   .al-edit-row input[type="date"] {
-    width: 132px;
-    flex-shrink: 0;
+    width: 148px;
+    flex: 0 0 auto;
     box-sizing: border-box;
     padding: 7px 8px;
     border-radius: 8px;
     border: 1.5px solid var(--border);
     background: var(--surface2);
     color: var(--text);
-    font-size: 13px;
+    font-size: 16px;       /* 16px未満だとiOSでフォーカス時に画面が拡大される */
+    font-variant-numeric: tabular-nums;
+    text-align: center;
     font-family: 'Noto Sans JP', sans-serif;
     outline: none;
   }
-  .al-edit-row .al-time-input { padding: 7px 8px; font-size: 13px; width: 82px; }
-  .al-edit-row .memo-input { padding: 7px 10px; font-size: 15px; flex: 1 1 140px; }
+  .al-edit-row input[type="date"]::-webkit-datetime-edit { text-align: center; width: 100%; }
+  .al-edit-row .al-time-input { padding: 7px 6px; font-size: 16px; width: 100px; min-width: 100px; }
+  .al-edit-row .memo-input { padding: 7px 10px; font-size: 16px; flex: 1 1 140px; }
   .al-edit-actions { display: flex; gap: 6px; width: 100%; justify-content: flex-end; }
   .al-edit-actions button {
     padding: 5px 12px;
@@ -2006,7 +2019,7 @@
           </div>
         </div>
         <div class="al-date-bar" id="alDateBar"></div>
-        <div class="memo-input-row">
+        <div class="memo-input-row al-input-row">
           <input class="al-time-input" id="alTime" type="time">
           <select class="al-select" id="alSelect"></select>
           <button class="memo-add-btn" onclick="alAdd()" data-i18n="alAdd">記録</button>
