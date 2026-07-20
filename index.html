@@ -1619,9 +1619,19 @@
     outline: none;
   }
   /* Safari/Chromeの内部要素も中央に寄せる */
+  /* iOS Safari は値を ::-webkit-date-and-time-value で描画するため、これが無いと中央寄せが効かない */
+  .al-time-input::-webkit-date-and-time-value {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
+  /* Chrome / Edge 系 */
   .al-time-input::-webkit-datetime-edit { text-align: center; width: 100%; }
-  .al-time-input::-webkit-datetime-edit-fields-wrapper { justify-content: center; }
+  .al-time-input::-webkit-datetime-edit-fields-wrapper { justify-content: center; width: 100%; }
   .al-time-input::-webkit-calendar-picker-indicator { display: none; }
+  /* Firefox */
+  .al-time-input { -moz-text-align-last: center; text-align-last: center; }
   .al-input-row { flex-wrap: wrap; }
   .al-input-row .al-select { flex: 1 1 110px; min-width: 110px; }
   .al-input-row .memo-add-btn { flex: 0 0 auto; }
@@ -1751,7 +1761,15 @@
     font-family: 'Noto Sans JP', sans-serif;
     outline: none;
   }
+  .al-edit-row input[type="date"]::-webkit-date-and-time-value {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
   .al-edit-row input[type="date"]::-webkit-datetime-edit { text-align: center; width: 100%; }
+  .al-edit-row input[type="date"]::-webkit-datetime-edit-fields-wrapper { justify-content: center; width: 100%; }
+  .al-edit-row input[type="date"] { -moz-text-align-last: center; text-align-last: center; }
   .al-edit-row .al-time-input { padding: 7px 6px; font-size: 16px; width: 100px; min-width: 100px; }
   .al-edit-row .memo-input { padding: 7px 10px; font-size: 16px; flex: 1 1 140px; }
   .al-edit-actions { display: flex; gap: 6px; width: 100%; justify-content: flex-end; }
@@ -2161,7 +2179,7 @@
 
   <div class="footer" data-i18n="footer1">ととのえ時間　ブラウザ完結　アカウント登録不要</div>
   <div class="footer" style="margin-top:4px" data-i18n="footer2">制作：fukui.konmari</div>
-  <div style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.19-11.55</div>
+  <div id="appVer" style="text-align:center;font-size:9px;color:var(--text-dim);opacity:0.5;font-family:monospace;letter-spacing:0.5px;margin-top:2px">Ver2026.7.20-10.36</div>
 
   <!-- Notification help modal -->
   <div class="notif-help-modal" id="notifHelpModal" style="display:none" onclick="closeNotifHelp(event)">
@@ -5590,8 +5608,16 @@ function updateThemeLabels() {
 // ════════════════════════════════════════
 //  Service Worker (PWA)
 // ════════════════════════════════════════
+// 版数はフッター表示(#appVer)を唯一のソースにする。
+// 以前フッターと sw.js?v= が別々のリテラルで、片方だけ更新されて食い違った。
+const APP_VER = (function() {
+  const el = document.getElementById('appVer');
+  const v = el ? el.textContent.replace(/^\s*Ver/i, '').trim() : '';
+  return v || 'dev';
+})();
+
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=2026.7.20-10.28').catch(() => {});
+  navigator.serviceWorker.register('./sw.js?v=' + APP_VER).catch(() => {});
 }
 // ════════════════════════════════════════
 //  Screen Lock (pocket mode)
